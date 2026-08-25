@@ -57,8 +57,9 @@ body.has-voice #app{padding-bottom:calc(160px + env(safe-area-inset-bottom))}
   display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;padding:32px;text-align:center}
 #splash.hide{animation:splashOut .5s ease forwards}
 @keyframes splashOut{to{opacity:0;visibility:hidden}}
-#splash .logo{width:96px;height:96px;border-radius:28px;background:rgba(255,255,255,.2);display:flex;align-items:center;
-  justify-content:center;font-size:52px;font-weight:800;margin-bottom:22px;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+#splash .logo{width:112px;height:112px;margin-bottom:18px;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+#splash .logo svg{width:100%;height:100%;filter:drop-shadow(0 4px 18px rgba(0,0,0,.22))}
+#splash .wordmark{font-size:13.5px;font-weight:800;letter-spacing:3.5px;opacity:.85;margin-bottom:6px;text-transform:uppercase}
 @keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
 #splash h1{font-size:30px;margin-bottom:8px}
 #splash p{opacity:.9;font-size:16px;max-width:340px;margin-bottom:26px;line-height:1.6}
@@ -291,7 +292,12 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 2px}
 </head>
 <body>
 <div id="splash">
-  <div class="logo">ק</div>
+  <div class="logo" aria-hidden="true"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#fff" d="M50 8 C53 33 57 39 82 42 C57 45 53 51 50 76 C47 51 43 45 18 42 C43 39 47 33 50 8 Z"/>
+    <path fill="#fff" opacity=".82" d="M83 12 C84.3 22 85.8 24.2 95 25.6 C85.8 27 84.3 29.2 83 39 C81.7 29.2 80.2 27 71 25.6 C80.2 24.2 81.7 22 83 12 Z"/>
+    <path fill="#fff" opacity=".6" d="M20 62 C20.9 68.4 21.9 70 28 71 C21.9 72 20.9 73.6 20 80 C19.1 73.6 18.1 72 12 71 C18.1 70 19.1 68.4 20 62 Z"/>
+  </svg></div>
+  <div class="wordmark">Learning Claude</div>
   <h1>קלוד מאסטר</h1>
   <p>הקורס המקיף בעברית — מאפס מוחלט ועד רמת מומחה בכל יכולות קלוד</p>
   <div class="feats">
