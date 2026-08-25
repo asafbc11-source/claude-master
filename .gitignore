@@ -1,0 +1,11 @@
+# קבצי פיתוח זמניים (נוצרים עם build.py --debug)
+_debug.html
+_debug_app.js
+_debug_engine.js
+_syntax_test.html
+
+# מערכת
+Thumbs.db
+desktop.ini
+.DS_Store
+__pycache__/

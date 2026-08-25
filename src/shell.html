@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#C96442" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#171310" media="(prefers-color-scheme: dark)">
+<meta name="description" content="קורס מקיף בעברית לשליטה מקצועית בקלוד — מאפס ועד רמת מומחה">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="קלוד מאסטר">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>קלוד מאסטר — לומדים קלוד מאפס</title>
+<style>
+:root{
+  --bg:#faf6f2; --bg2:#ffffff; --bg3:#f3ece4; --bg4:#ece1d5; --ink:#2d2420; --ink2:#6b5d54; --ink3:#9a8b80;
+  --brand:#C96442; --brand2:#a94f31; --brand-soft:#f7e4db; --accent:#7c5cbf; --accent-soft:#ece5f8;
+  --ok:#2e7d4f; --ok-soft:#dff0e5; --warn:#b3541e; --warn-soft:#fdeeda; --err:#c0392b; --err-soft:#fde3df;
+  --gold:#c9962b; --gold-soft:#fbf0d4;
+  --line:#e8ddd3; --shadow:0 1px 3px rgba(60,40,20,.07),0 4px 16px rgba(60,40,20,.06);
+  --shadow-lg:0 4px 12px rgba(60,40,20,.10),0 12px 32px rgba(60,40,20,.10);
+  --code-bg:#221c19; --code-ink:#f5e9dd; --code-dim:#9c8b7d;
+  --r:18px; --rs:12px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#171310; --bg2:#211b17; --bg3:#2a221d; --bg4:#352b24; --ink:#f0e7df; --ink2:#b5a698; --ink3:#84766b;
+  --brand:#e08a66; --brand2:#eda583; --brand-soft:#3a2a22; --accent:#a98fe0; --accent-soft:#2e2740;
+  --ok:#6cc493; --ok-soft:#1e2f26; --warn:#e09a5c; --warn-soft:#33271a; --err:#e57d70; --err-soft:#3a211e;
+  --gold:#e5c264; --gold-soft:#332a16;
+  --line:#3a2f28; --shadow:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.5),0 12px 32px rgba(0,0,0,.4);
+  --code-bg:#0f0c0a; --code-ink:#e8dccf; --code-dim:#7d6f63;
+}}
+:root[data-theme="dark"]{
+  --bg:#171310; --bg2:#211b17; --bg3:#2a221d; --bg4:#352b24; --ink:#f0e7df; --ink2:#b5a698; --ink3:#84766b;
+  --brand:#e08a66; --brand2:#eda583; --brand-soft:#3a2a22; --accent:#a98fe0; --accent-soft:#2e2740;
+  --ok:#6cc493; --ok-soft:#1e2f26; --warn:#e09a5c; --warn-soft:#33271a; --err:#e57d70; --err-soft:#3a211e;
+  --gold:#e5c264; --gold-soft:#332a16;
+  --line:#3a2f28; --shadow:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  --shadow-lg:0 4px 12px rgba(0,0,0,.5),0 12px 32px rgba(0,0,0,.4);
+  --code-bg:#0f0c0a; --code-ink:#e8dccf; --code-dim:#7d6f63;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Segoe UI","Heebo","Noto Sans Hebrew",-apple-system,Roboto,Arial,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.65; font-size:16.5px;
+  min-height:100dvh; overscroll-behavior-y:none; -webkit-font-smoothing:antialiased;
+}
+#app{max-width:780px;margin:0 auto;padding:calc(60px + env(safe-area-inset-top)) 16px calc(92px + env(safe-area-inset-bottom));min-height:100dvh}
+body.has-voice #app{padding-bottom:calc(160px + env(safe-area-inset-bottom))}
+/* ---------- Splash ---------- */
+#splash{position:fixed;inset:0;z-index:200;background:linear-gradient(150deg,var(--brand) 0%,var(--brand2) 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;padding:32px;text-align:center}
+#splash.hide{animation:splashOut .5s ease forwards}
+@keyframes splashOut{to{opacity:0;visibility:hidden}}
+#splash .logo{width:96px;height:96px;border-radius:28px;background:rgba(255,255,255,.2);display:flex;align-items:center;
+  justify-content:center;font-size:52px;font-weight:800;margin-bottom:22px;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+#splash h1{font-size:30px;margin-bottom:8px}
+#splash p{opacity:.9;font-size:16px;max-width:340px;margin-bottom:26px;line-height:1.6}
+#splash .feats{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;text-align:right;width:100%;max-width:330px}
+#splash .feat{background:rgba(255,255,255,.15);border-radius:14px;padding:11px 15px;font-size:14.5px;display:flex;gap:10px;align-items:center}
+/* ---------- App bar ---------- */
+.appbar{position:fixed;top:0;right:0;left:0;z-index:40;background:color-mix(in srgb,var(--bg) 86%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.appbar-in{max-width:780px;margin:0 auto;display:flex;align-items:center;gap:6px;height:60px;padding:0 10px}
+.appbar .title{font-weight:700;font-size:17px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.iconbtn{border:none;background:none;color:var(--ink);width:40px;height:40px;border-radius:50%;font-size:20px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:background .15s}
+.iconbtn:active{background:var(--bg3)}
+.pts{display:flex;align-items:center;gap:4px;background:var(--brand-soft);color:var(--brand);font-weight:800;
+  font-size:13.5px;border-radius:99px;padding:5px 11px;flex:none}
+.streak{display:flex;align-items:center;gap:3px;background:var(--warn-soft);color:var(--warn);font-weight:800;
+  font-size:13.5px;border-radius:99px;padding:5px 10px;flex:none}
+/* ---------- Bottom nav ---------- */
+.bnav{position:fixed;bottom:0;right:0;left:0;z-index:45;background:color-mix(in srgb,var(--bg2) 90%,transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.bnav-in{max-width:780px;margin:0 auto;display:flex}
+.bnav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 0 8px;text-decoration:none;
+  color:var(--ink3);font-size:11px;font-weight:700;transition:color .15s}
+.bnav a .bi{font-size:21px;line-height:1;transition:transform .2s cubic-bezier(.2,1.4,.4,1)}
+.bnav a.on{color:var(--brand)}
+.bnav a.on .bi{transform:translateY(-2px) scale(1.15)}
+/* ---------- Cards ---------- */
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;margin-bottom:14px}
+.screen{animation:in .3s cubic-bezier(.2,.8,.3,1)}
+@keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+h1{font-size:24px;line-height:1.3;margin-bottom:6px}
+h2{font-size:19px;margin:8px 0}
+.sub{color:var(--ink2);font-size:14.5px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:inherit;
+  font-size:16px;font-weight:700;border-radius:15px;padding:13px 22px;background:var(--brand);color:#fff;
+  transition:transform .12s,opacity .15s,box-shadow .15s;text-decoration:none;box-shadow:0 2px 8px rgba(201,100,66,.25)}
+.btn:active{transform:scale(.97)}
+.btn.sec{background:var(--bg3);color:var(--ink);box-shadow:none}
+.btn.ghost{background:none;color:var(--brand);padding:9px 14px;box-shadow:none}
+.btn.wide{width:100%}
+.btn.sm{font-size:14px;padding:9px 16px;border-radius:12px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:700;border-radius:99px;padding:3px 11px}
+.chip.pc{background:var(--accent-soft);color:var(--accent)}
+.chip.ph{background:var(--ok-soft);color:var(--ok)}
+.chip.done{background:var(--ok-soft);color:var(--ok)}
+.chip.brand{background:var(--brand-soft);color:var(--brand)}
+.chip.gold{background:var(--gold-soft);color:var(--gold)}
+.chip.lvl{background:var(--bg3);color:var(--ink2)}
+.progress-bar{height:7px;border-radius:99px;background:var(--bg3);overflow:hidden}
+.progress-bar>i{display:block;height:100%;border-radius:99px;background:var(--brand);transition:width .6s cubic-bezier(.2,.8,.3,1)}
+.progress-bar.ok>i{background:var(--ok)}
+/* ---------- Home ---------- */
+.hero{background:linear-gradient(140deg,var(--brand) 0%,var(--brand2) 100%);color:#fff;border:none;position:relative;overflow:hidden;box-shadow:var(--shadow-lg)}
+.hero::after{content:"";position:absolute;top:-40%;left:-10%;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.08)}
+.hero .sub{color:rgba(255,255,255,.88)}
+.hero h1{color:#fff;position:relative}
+.ring-wrap{display:flex;align-items:center;gap:16px;position:relative}
+.ring{width:76px;height:76px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring text{transform:rotate(90deg)}
+.sect-h{display:flex;align-items:center;gap:8px;margin:20px 4px 10px;font-size:15px;font-weight:800;color:var(--ink2)}
+.sect-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.modcard{display:flex;align-items:center;gap:13px;text-decoration:none;color:inherit;cursor:pointer;transition:transform .12s}
+.modcard:active{transform:scale(.985)}
+.modcard .mi{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none;background:var(--bg3)}
+.modcard .mtx{flex:1;min-width:0}
+.modcard .mtx b{display:block;font-size:16px;margin-bottom:2px}
+.modcard .mtx .sub{font-size:13px;margin-bottom:7px}
+.modcard .arr{color:var(--ink3);font-size:18px;flex:none;transform:scaleX(-1)}
+/* ---------- Tabs ---------- */
+.tabs{display:flex;background:var(--bg3);border-radius:15px;padding:4px;margin-bottom:16px;gap:2px}
+.tabs button{flex:1;border:none;background:none;font-family:inherit;font-size:13.5px;font-weight:700;padding:9px 2px;
+  border-radius:12px;color:var(--ink2);cursor:pointer;transition:background .15s,color .15s}
+.tabs button.on{background:var(--bg2);color:var(--brand);box-shadow:var(--shadow)}
+/* ---------- Rows ---------- */
+.row{display:flex;align-items:center;gap:12px;padding:14px 6px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit;cursor:pointer}
+.row:last-child{border-bottom:none}
+.row .st{width:30px;height:30px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;background:var(--bg3);color:var(--ink3)}
+.row.done .st{background:var(--ok-soft);color:var(--ok)}
+.row .rtx{flex:1;min-width:0}
+.row .rtx b{font-size:15.5px;display:block}
+.row .rtx .sub{font-size:12.5px}
+/* ---------- Lesson ---------- */
+.lesson{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 20px;font-size:16.5px}
+.lesson h2{font-size:20px;margin:24px 0 8px;color:var(--brand)}
+.lesson h2:first-child{margin-top:0}
+.lesson h3{font-size:17px;margin:18px 0 6px}
+.lesson p{margin:0 0 12px}
+.lesson ul,.lesson ol{margin:0 0 14px;padding-right:22px}
+.lesson li{margin-bottom:6px}
+.lesson .term{color:var(--brand);font-weight:800}
+.lesson .en{color:var(--ink3);font-size:.85em;font-weight:400}
+.box{border-radius:var(--rs);padding:13px 15px;margin:0 0 14px;font-size:15.5px}
+.box b:first-child{display:block;margin-bottom:3px}
+.box.tip{background:var(--ok-soft)}
+.box.warn{background:var(--warn-soft)}
+.box.info{background:var(--accent-soft)}
+.box.try{background:var(--brand-soft);border:1.5px dashed var(--brand)}
+.box.pro{background:var(--gold-soft);border-right:4px solid var(--gold)}
+.code{direction:ltr;text-align:left;background:var(--code-bg);color:var(--code-ink);border-radius:var(--rs);padding:13px 15px;
+  margin:0 0 14px;font-family:Consolas,"Courier New",monospace;font-size:14px;overflow-x:auto;white-space:pre;line-height:1.6}
+.prompt-ex{background:var(--bg3);border-right:4px solid var(--brand);border-radius:var(--rs);padding:12px 14px;margin:0 0 14px;font-size:15.5px}
+.prompt-ex .pl{font-size:11.5px;font-weight:800;color:var(--brand);letter-spacing:.4px;margin-bottom:4px}
+.kbd{display:inline-block;direction:ltr;background:var(--bg3);border:1px solid var(--line);border-bottom-width:2.5px;
+  border-radius:6px;padding:1px 8px;font-family:Consolas,monospace;font-size:.85em;font-weight:700}
+table.cmp{width:100%;border-collapse:collapse;margin:0 0 14px;font-size:14.5px}
+table.cmp th{background:var(--bg3);text-align:right;padding:8px 10px;border:1px solid var(--line)}
+table.cmp td{padding:8px 10px;border:1px solid var(--line);vertical-align:top}
+.tbl-wrap{overflow-x:auto;margin:0 0 14px;-webkit-overflow-scrolling:touch}
+.tbl-wrap table.cmp{margin:0;min-width:460px}
+.lesson-nav{display:flex;gap:10px;margin-top:16px}
+.lesson-nav .btn{flex:1}
+/* ---------- Demos ---------- */
+.demo{border:1.5px solid var(--line);border-radius:var(--rs);overflow:hidden;margin:0 0 16px;background:var(--bg3)}
+.demo-head{display:flex;align-items:center;gap:9px;padding:10px 13px;background:var(--bg4);font-size:13.5px;font-weight:800;color:var(--ink2)}
+.demo-head .dt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.demo-play{border:none;background:var(--brand);color:#fff;border-radius:9px;padding:5px 13px;font-family:inherit;
+  font-size:12.5px;font-weight:800;cursor:pointer;flex:none}
+.demo-play:active{transform:scale(.95)}
+.termbox{direction:ltr;text-align:left;background:var(--code-bg);color:var(--code-ink);padding:13px 15px;
+  font-family:Consolas,"Courier New",monospace;font-size:13.5px;line-height:1.7;min-height:80px;overflow-x:auto;white-space:pre-wrap;word-break:break-word}
+.termbox .c-cmd{color:#8fd4ff}.termbox .c-ok{color:#8ce0a8}.termbox .c-err{color:#ff9d8f}
+.termbox .c-out{color:var(--code-dim)}.termbox .c-note{color:#e5c264;font-style:italic}
+.termbox .cur{display:inline-block;width:8px;height:15px;background:var(--code-ink);vertical-align:-2px;animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.chat{padding:13px;display:flex;flex-direction:column;gap:9px;min-height:80px;background:var(--bg2)}
+.bub{max-width:88%;padding:9px 13px;border-radius:15px;font-size:14.5px;line-height:1.6;white-space:pre-wrap;animation:in .25s ease}
+.bub.u{background:var(--brand);color:#fff;align-self:flex-start;border-bottom-right-radius:5px}
+.bub.c{background:var(--bg3);color:var(--ink);align-self:flex-end;border-bottom-left-radius:5px}
+.bub.t{background:var(--accent-soft);color:var(--accent);align-self:flex-end;font-family:Consolas,monospace;font-size:12.5px;direction:ltr;text-align:left}
+.flow{padding:13px;background:var(--bg2)}
+.fstep{display:flex;gap:11px;align-items:flex-start;padding:10px 11px;border-radius:12px;margin-bottom:7px;
+  opacity:.38;transition:opacity .35s,background .35s,transform .35s;background:var(--bg3)}
+.fstep.on{opacity:1;background:var(--brand-soft);transform:translateX(-4px)}
+.fstep .fi{font-size:22px;flex:none;line-height:1.2}
+.fstep b{display:block;font-size:14.5px;margin-bottom:1px}
+.fstep span{font-size:13px;color:var(--ink2)}
+.cmp2{padding:13px;background:var(--bg2);display:grid;gap:10px}
+.cmp2 .side{border-radius:12px;padding:11px 13px;font-size:14.5px;line-height:1.6;white-space:pre-wrap}
+.cmp2 .side.bad{background:var(--err-soft);border-right:4px solid var(--err)}
+.cmp2 .side.good{background:var(--ok-soft);border-right:4px solid var(--ok)}
+.cmp2 .side .cl{font-size:11.5px;font-weight:800;letter-spacing:.3px;margin-bottom:4px;opacity:.85}
+.cmp2 .note{font-size:13.5px;color:var(--ink2);padding:0 3px}
+/* ---------- Voice ---------- */
+.voicebar{position:fixed;bottom:calc(64px + env(safe-area-inset-bottom));right:0;left:0;z-index:44;
+  background:color-mix(in srgb,var(--bg2) 95%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);box-shadow:0 -4px 20px rgba(0,0,0,.08);animation:in .25s ease}
+.voicebar-in{max-width:780px;margin:0 auto;padding:9px 14px 11px}
+.vb-row{display:flex;align-items:center;gap:8px}
+.vb-btn{border:none;background:var(--bg3);color:var(--ink);width:36px;height:36px;border-radius:50%;font-size:15px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.vb-btn.main{background:var(--brand);color:#fff;width:42px;height:42px;font-size:17px}
+.vb-btn:active{transform:scale(.93)}
+.vb-txt{flex:1;min-width:0;font-size:13.5px;color:var(--ink2);line-height:1.45;max-height:38px;overflow:hidden}
+.vb-txt b{color:var(--ink);font-weight:600}
+.vb-meta{display:flex;align-items:center;gap:8px;margin-top:7px;font-size:11.5px;color:var(--ink3)}
+.vb-meta .progress-bar{flex:1;height:4px}
+.vb-speed{border:none;background:var(--bg3);color:var(--ink2);border-radius:8px;padding:3px 9px;font-family:inherit;
+  font-size:11.5px;font-weight:800;cursor:pointer}
+.voice-cta{display:flex;align-items:center;gap:10px;background:var(--accent-soft);border-radius:var(--rs);
+  padding:11px 14px;margin-bottom:14px;cursor:pointer;border:none;width:100%;font-family:inherit;text-align:right;color:var(--ink)}
+.voice-cta .vi{font-size:22px}
+.voice-cta b{display:block;font-size:14.5px}
+.voice-cta span{font-size:12.5px;color:var(--ink2)}
+/* ---------- Videos ---------- */
+.vid{display:flex;gap:12px;align-items:flex-start;padding:14px 6px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+.vid:last-child{border-bottom:none}
+.vid .vth{width:46px;height:46px;border-radius:13px;background:var(--err-soft);color:var(--err);display:flex;
+  align-items:center;justify-content:center;font-size:21px;flex:none}
+.vid .vtx{flex:1;min-width:0}
+.vid .vtx b{font-size:15px;display:block;margin-bottom:2px}
+.vid .vtx .sub{font-size:12.5px}
+.vid .vmeta{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+/* ---------- Quiz ---------- */
+.q-opt{display:block;width:100%;text-align:right;font-family:inherit;font-size:16px;background:var(--bg2);
+  border:2px solid var(--line);border-radius:15px;padding:14px 16px;margin-bottom:10px;cursor:pointer;color:var(--ink);
+  transition:border-color .15s,background .15s}
+.q-opt:active{background:var(--bg3)}
+.q-opt.sel-ok{border-color:var(--ok);background:var(--ok-soft)}
+.q-opt.sel-err{border-color:var(--err);background:var(--err-soft)}
+.q-opt.reveal{border-color:var(--ok)}
+.q-opt[disabled]{cursor:default}
+.q-head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.q-head .progress-bar{flex:1}
+.q-exp{border-radius:var(--rs);padding:13px 15px;margin:4px 0 14px;font-size:15px;animation:in .25s ease}
+.q-exp.good{background:var(--ok-soft)}
+.q-exp.bad{background:var(--err-soft)}
+.score-big{font-size:56px;font-weight:800;text-align:center;color:var(--brand);line-height:1.1}
+/* ---------- Exercise ---------- */
+.crit{display:flex;align-items:flex-start;gap:11px;padding:11px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.crit:last-child{border-bottom:none}
+.crit input{width:21px;height:21px;margin-top:2px;accent-color:var(--ok);flex:none}
+.steps{counter-reset:st;list-style:none;padding:0;margin:0 0 8px}
+.steps li{counter-increment:st;position:relative;padding:0 40px 16px 0}
+.steps li::before{content:counter(st);position:absolute;right:0;top:0;width:28px;height:28px;border-radius:50%;
+  background:var(--brand-soft);color:var(--brand);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.steps li:not(:last-child)::after{content:"";position:absolute;right:13.5px;top:30px;bottom:2px;width:1.5px;background:var(--line)}
+/* ---------- Search / glossary ---------- */
+.search{width:100%;font-family:inherit;font-size:16px;background:var(--bg2);border:1.5px solid var(--line);
+  border-radius:15px;padding:12px 16px;color:var(--ink);margin-bottom:14px}
+.search:focus{outline:none;border-color:var(--brand)}
+.gterm{padding:12px 4px;border-bottom:1px solid var(--line)}
+.gterm:last-child{border-bottom:none}
+.gterm b{color:var(--brand)}
+.gterm .gen{color:var(--ink3);font-size:13px;direction:ltr;display:inline-block}
+.gterm p{font-size:14.5px;color:var(--ink2);margin-top:2px}
+mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 2px}
+/* ---------- Achievements ---------- */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.ach{background:var(--bg2);border:1px solid var(--line);border-radius:15px;padding:13px 8px;text-align:center;opacity:.4;
+  transition:opacity .3s,transform .2s}
+.ach.got{opacity:1;border-color:var(--gold);background:var(--gold-soft)}
+.ach .ai{font-size:27px;display:block;margin-bottom:5px}
+.ach b{font-size:12px;display:block;line-height:1.35}
+/* ---------- Misc ---------- */
+.center{text-align:center}
+.mt{margin-top:14px}.mb0{margin-bottom:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:14px;text-align:center}
+.stat b{font-size:26px;color:var(--brand);display:block;line-height:1.2}
+.stat span{font-size:12.5px;color:var(--ink2)}
+.toast{position:fixed;bottom:calc(100px + env(safe-area-inset-bottom));right:50%;transform:translateX(50%);
+  background:var(--ink);color:var(--bg);padding:11px 22px;border-radius:99px;font-weight:700;font-size:14.5px;z-index:60;
+  animation:in .25s ease;box-shadow:var(--shadow-lg);white-space:nowrap;max-width:92vw;overflow:hidden;text-overflow:ellipsis}
+.toast.gold{background:linear-gradient(135deg,var(--gold),#b8860b);color:#fff}
+::selection{background:var(--brand-soft)}
+</style>
+</head>
+<body>
+<div id="splash">
+  <div class="logo">ק</div>
+  <h1>קלוד מאסטר</h1>
+  <p>הקורס המקיף בעברית — מאפס מוחלט ועד רמת מומחה בכל יכולות קלוד</p>
+  <div class="feats">
+    <div class="feat">🔊 מורה קולי שמקריא כל שיעור</div>
+    <div class="feat">🎬 הדגמות אינטראקטיביות חיות</div>
+    <div class="feat">🛠️ תרגילים אמיתיים לביצוע בקלוד</div>
+    <div class="feat">🧠 בחנים חכמים ללא חזרות</div>
+  </div>
+  <button class="btn" style="background:#fff;color:var(--brand2)" id="splashgo">בוא נתחיל ←</button>
+</div>
+
+<div class="appbar"><div class="appbar-in">
+  <button class="iconbtn" id="backbtn" style="display:none" aria-label="חזרה">→</button>
+  <div class="title" id="bar-title">קלוד מאסטר</div>
+  <div class="streak" id="bar-streak" style="display:none">🔥 0</div>
+  <div class="pts" id="bar-pts">⭐ 0</div>
+  <button class="iconbtn" id="searchbtn" aria-label="חיפוש">🔍</button>
+  <button class="iconbtn" id="themebtn" aria-label="מצב תצוגה">◐</button>
+</div></div>
+
+<main id="app"></main>
+
+<nav class="bnav"><div class="bnav-in">
+  <a href="#home" data-nav="home"><span class="bi">🏠</span>בית</a>
+  <a href="#mix" data-nav="mix"><span class="bi">🎯</span>תרגול</a>
+  <a href="#gloss" data-nav="gloss"><span class="bi">📖</span>מילון</a>
+  <a href="#prog" data-nav="prog"><span class="bi">📈</span>התקדמות</a>
+</div></nav>
+
+<script>
+"use strict";
+/* ================== COURSE DATA ================== */
+window.COURSE_MODULES=[];
+window.GLOSSARY=[];
+/*==CONTENT==*/
+/* ================== ENGINE ================== */
+(function(){
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const MODS=window.COURSE_MODULES, GLOSS=window.GLOSSARY;
+
+/* ---------- state ---------- */
+const KEY="claude_master_v1";
+let S;
+try{S=JSON.parse(localStorage.getItem(KEY))||{}}catch(e){S={}}
+S.lessons=S.lessons||{}; S.crit=S.crit||{}; S.exDone=S.exDone||{};
+S.seen=S.seen||{}; S.qstats=S.qstats||{}; S.pts=S.pts||0; S.theme=S.theme||"";
+S.ach=S.ach||{}; S.streak=S.streak||{n:0,last:""}; S.voice=S.voice||{rate:1};
+S.flags=S.flags||{};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function addPts(n){S.pts+=n;save();paintBar()}
+function today(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
+function touchStreak(){
+  const t=today();if(S.streak.last===t)return;
+  const y=new Date(Date.now()-864e5);const ys=y.getFullYear()+"-"+(y.getMonth()+1)+"-"+y.getDate();
+  S.streak.n=(S.streak.last===ys)?S.streak.n+1:1;S.streak.last=t;save();paintBar();
+}
+/* ---------- theme ---------- */
+function applyTheme(){if(S.theme)document.documentElement.setAttribute("data-theme",S.theme);else document.documentElement.removeAttribute("data-theme")}
+applyTheme();
+$("#themebtn").onclick=()=>{
+  const cur=S.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");
+  S.theme=cur==="dark"?"light":"dark";save();applyTheme();
+};
+/* ---------- splash ---------- */
+if(S.flags.splashSeen){$("#splash").style.display="none"}
+$("#splashgo").onclick=()=>{S.flags.splashSeen=1;save();const s=$("#splash");s.classList.add("hide");setTimeout(()=>s.style.display="none",500)};
+/* ---------- helpers ---------- */
+function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function toast(msg,gold){const t=document.createElement("div");t.className="toast"+(gold?" gold":"");t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function modById(id){return MODS.find(m=>m.id===id)}
+function lessonKey(m,l){return m.id+"/"+l.id}
+function exKey(m,x){return m.id+"/"+x.id}
+function modLessonsDone(m){return m.lessons.filter(l=>S.lessons[lessonKey(m,l)]).length}
+function modExDone(m){return m.exercises.filter(x=>S.exDone[exKey(m,x)]).length}
+function modPct(m){const t=m.lessons.length+m.exercises.length;return t?Math.round(100*(modLessonsDone(m)+modExDone(m))/t):0}
+function totLessons(){return MODS.reduce((a,m)=>a+m.lessons.length,0)}
+function totEx(){return MODS.reduce((a,m)=>a+m.exercises.length,0)}
+function doneLessons(){return MODS.reduce((a,m)=>a+modLessonsDone(m),0)}
+function doneEx(){return MODS.reduce((a,m)=>a+modExDone(m),0)}
+function qTotals(){let a=0,c=0;Object.values(S.qstats).forEach(s=>{a+=s.a;c+=s.c});return{a,c}}
+function overallPct(){const t=totLessons()+totEx();return t?Math.round(100*(doneLessons()+doneEx())/t):0}
+function ring(pct,size){
+  const r=(size-8)/2,c=2*Math.PI*r;
+  return '<div class="ring" style="width:'+size+'px;height:'+size+'px"><svg width="'+size+'" height="'+size+'">'+
+  '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="7"/>'+
+  '<circle cx="'+size/2+'" cy="'+size/2+'" r="'+r+'" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" '+
+  'stroke-dasharray="'+c+'" stroke-dashoffset="'+(c*(1-pct/100))+'"/>'+
+  '<text x="'+size/2+'" y="'+(-size/2)+'" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="16" font-weight="800">'+pct+'%</text>'+
+  '</svg></div>';
+}
+function paintBar(){
+  $("#bar-pts").textContent="⭐ "+S.pts;
+  const st=$("#bar-streak");
+  if(S.streak.n>0){st.style.display="flex";st.textContent="🔥 "+S.streak.n}else st.style.display="none";
+}
+function setBar(title,back){$("#bar-title").textContent=title;$("#backbtn").style.display=back?"flex":"none";paintBar()}
+$("#backbtn").onclick=()=>history.back();
+$("#searchbtn").onclick=()=>{location.hash="search"};
+
+/* ---------- achievements ---------- */
+const ACH=[
+ {id:"l1",i:"🌱",t:"הצעד הראשון",c:()=>doneLessons()>=1},
+ {id:"l10",i:"📚",t:"10 שיעורים",c:()=>doneLessons()>=10},
+ {id:"l50",i:"🎓",t:"50 שיעורים",c:()=>doneLessons()>=50},
+ {id:"lall",i:"🏅",t:"כל השיעורים",c:()=>doneLessons()>=totLessons()&&totLessons()>0},
+ {id:"x1",i:"🛠️",t:"תרגיל ראשון",c:()=>doneEx()>=1},
+ {id:"x10",i:"⚒️",t:"10 תרגילים",c:()=>doneEx()>=10},
+ {id:"xall",i:"🏗️",t:"כל התרגילים",c:()=>doneEx()>=totEx()&&totEx()>0},
+ {id:"q50",i:"🧠",t:"50 שאלות",c:()=>qTotals().a>=50},
+ {id:"q150",i:"🦉",t:"150 שאלות",c:()=>qTotals().a>=150},
+ {id:"acc",i:"🎯",t:"דיוק 90%",c:()=>{const t=qTotals();return t.a>=30&&t.c/t.a>=.9}},
+ {id:"s3",i:"🔥",t:"3 ימים ברצף",c:()=>S.streak.n>=3},
+ {id:"s7",i:"⚡",t:"7 ימים ברצף",c:()=>S.streak.n>=7},
+ {id:"m1",i:"👑",t:"מודול מושלם",c:()=>MODS.some(m=>modPct(m)===100)},
+ {id:"mall",i:"🏆",t:"הקורס כולו",c:()=>MODS.length>0&&MODS.every(m=>modPct(m)===100)},
+ {id:"voice",i:"🔊",t:"המורה הקולי",c:()=>!!S.flags.usedVoice},
+ {id:"demo",i:"🎬",t:"הדגמה ראשונה",c:()=>!!S.flags.usedDemo}
+];
+function checkAch(){
+  ACH.forEach(a=>{if(!S.ach[a.id]&&a.c()){S.ach[a.id]=1;save();setTimeout(()=>toast("🏆 הישג חדש: "+a.t,true),400)}});
+}
+
+/* ================== VOICE (TTS) ================== */
+const V={on:false,sents:[],i:0,voice:null,ready:false,gen:0};
+function pickVoice(){
+  if(!("speechSynthesis" in window))return;
+  const vs=speechSynthesis.getVoices()||[];
+  V.voice=vs.find(v=>v.lang==="he-IL")||vs.find(v=>/^he/i.test(v.lang))||null;
+  V.ready=vs.length>0;
+}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function extractSentences(root){
+  const out=[];
+  root.querySelectorAll("h2,h3,p,li,.box,.prompt-ex").forEach(el=>{
+    if(el.closest(".code")||el.closest(".demo"))return;
+    let t=el.textContent.replace(/\s+/g," ").trim();
+    if(!t||t.length<2)return;
+    t.split(/(?<=[.!?:])\s+/).forEach(s=>{s=s.trim();if(s.length>1)out.push(s)});
+  });
+  return out;
+}
+function stopVoice(){
+  if("speechSynthesis" in window)speechSynthesis.cancel();
+  V.on=false;document.body.classList.remove("has-voice");
+  const b=$("#voicebar");if(b)b.remove();
+}
+function speakCur(){
+  if(!V.on||V.i>=V.sents.length){finishVoice();return}
+  // each utterance carries a generation tag; a cancelled one must not advance the index
+  const gen=++V.gen;
+  const u=new SpeechSynthesisUtterance(V.sents[V.i]);
+  u.lang="he-IL";u.rate=S.voice.rate;
+  if(V.voice)u.voice=V.voice;
+  u.onend=()=>{if(!V.on||gen!==V.gen)return;V.i++;paintVoice();speakCur()};
+  u.onerror=()=>{if(!V.on||gen!==V.gen)return;V.i++;paintVoice();setTimeout(speakCur,60)};
+  speechSynthesis.speak(u);
+  paintVoice();
+}
+function finishVoice(){toast("🔊 סיום ההקראה");stopVoice()}
+function paintVoice(){
+  const b=$("#voicebar");if(!b)return;
+  const pct=V.sents.length?Math.round(100*V.i/V.sents.length):0;
+  b.querySelector(".vb-txt").innerHTML="<b>"+esc(V.sents[V.i]||"")+"</b>";
+  b.querySelector(".vb-prog>i").style.width=pct+"%";
+  b.querySelector(".vb-count").textContent=(V.i+1)+"/"+V.sents.length;
+  b.querySelector("#vbplay").textContent=speechSynthesis.paused?"▶":"⏸";
+}
+function startVoice(){
+  if(!("speechSynthesis" in window)){toast("הדפדפן הזה לא תומך בהקראה");return}
+  const root=$(".lesson");if(!root)return;
+  V.sents=extractSentences(root);
+  if(!V.sents.length){toast("אין טקסט להקראה");return}
+  V.i=0;V.on=true;S.flags.usedVoice=1;save();checkAch();
+  document.body.classList.add("has-voice");
+  const bar=document.createElement("div");
+  bar.className="voicebar";bar.id="voicebar";
+  bar.innerHTML='<div class="voicebar-in">'+
+    '<div class="vb-row">'+
+      '<button class="vb-btn" id="vbprev" aria-label="הקודם">⏮</button>'+
+      '<button class="vb-btn main" id="vbplay" aria-label="הפעל/השהה">⏸</button>'+
+      '<button class="vb-btn" id="vbnext" aria-label="הבא">⏭</button>'+
+      '<div class="vb-txt"></div>'+
+      '<button class="vb-btn" id="vbstop" aria-label="עצור">✕</button>'+
+    '</div>'+
+    '<div class="vb-meta"><span class="vb-count">0/0</span>'+
+      '<div class="progress-bar vb-prog"><i style="width:0%"></i></div>'+
+      '<button class="vb-speed" id="vbspeed">'+S.voice.rate+'x</button></div>'+
+  '</div>';
+  document.body.appendChild(bar);
+  $("#vbplay").onclick=()=>{
+    if(speechSynthesis.paused){speechSynthesis.resume()}else{speechSynthesis.pause()}
+    setTimeout(paintVoice,50);
+  };
+  $("#vbnext").onclick=()=>{speechSynthesis.cancel();V.i=Math.min(V.i+1,V.sents.length-1);speakCur()};
+  $("#vbprev").onclick=()=>{speechSynthesis.cancel();V.i=Math.max(V.i-1,0);speakCur()};
+  $("#vbstop").onclick=stopVoice;
+  $("#vbspeed").onclick=()=>{
+    const opts=[0.8,1,1.2,1.5];S.voice.rate=opts[(opts.indexOf(S.voice.rate)+1)%opts.length];save();
+    $("#vbspeed").textContent=S.voice.rate+"x";
+    speechSynthesis.cancel();speakCur();
+  };
+  speakCur();
+}
+
+/* ================== DEMOS ================== */
+function mountDemo(slot,d){
+  const el=document.createElement("div");el.className="demo";
+  const head='<div class="demo-head"><span>'+(d.type==="terminal"?"⌨️":d.type==="chat"?"💬":d.type==="flow"?"🔄":"⚖️")+
+    '</span><span class="dt">'+esc(d.title||"הדגמה")+'</span>'+
+    (d.type==="compare"?"":'<button class="demo-play">▶ הפעל</button>')+'</div>';
+  let body="";
+  if(d.type==="terminal")body='<div class="termbox"></div>';
+  else if(d.type==="chat")body='<div class="chat"></div>';
+  else if(d.type==="flow")body='<div class="flow">'+d.steps.map(s=>
+    '<div class="fstep"><span class="fi">'+s.icon+'</span><div><b>'+esc(s.t)+'</b><span>'+esc(s.d)+'</span></div></div>').join("")+'</div>';
+  else if(d.type==="compare")body='<div class="cmp2">'+
+    '<div class="side bad"><div class="cl">'+esc(d.bad.label||"❌ פחות טוב")+'</div>'+esc(d.bad.text)+'</div>'+
+    '<div class="side good"><div class="cl">'+esc(d.good.label||"✅ טוב יותר")+'</div>'+esc(d.good.text)+'</div>'+
+    (d.note?'<div class="note">💡 '+esc(d.note)+'</div>':"")+'</div>';
+  el.innerHTML=head+body;
+  slot.replaceWith(el);
+  const btn=el.querySelector(".demo-play");
+  if(!btn)return;
+  let running=false;
+  btn.onclick=()=>{
+    if(running)return;running=true;btn.textContent="● רץ";
+    S.flags.usedDemo=1;save();checkAch();
+    const done=()=>{running=false;btn.textContent="↻ שוב"};
+    if(d.type==="terminal")playTerminal(el.querySelector(".termbox"),d.lines,done);
+    else if(d.type==="chat")playChat(el.querySelector(".chat"),d.turns,done);
+    else if(d.type==="flow")playFlow(el.querySelectorAll(".fstep"),done);
+  };
+}
+function playTerminal(box,lines,done){
+  box.innerHTML="";let li=0;
+  function nextLine(){
+    if(li>=lines.length){done();return}
+    const L=lines[li++];
+    const span=document.createElement("span");
+    span.className="c-"+(L.t||"out");
+    box.appendChild(span);
+    if(L.t==="cmd"){
+      const pre=document.createElement("span");pre.className="c-ok";pre.textContent="> ";
+      box.insertBefore(pre,span);
+      let ci=0;const cur=document.createElement("span");cur.className="cur";box.appendChild(cur);
+      (function type(){
+        if(ci<L.v.length){span.textContent+=L.v[ci++];box.scrollTop=box.scrollHeight;setTimeout(type,28)}
+        else{cur.remove();box.appendChild(document.createTextNode("\n"));setTimeout(nextLine,320)}
+      })();
+    }else{
+      span.textContent=L.v;box.appendChild(document.createTextNode("\n"));
+      box.scrollTop=box.scrollHeight;setTimeout(nextLine,420);
+    }
+  }
+  nextLine();
+}
+function playChat(box,turns,done){
+  box.innerHTML="";let ti=0;
+  function next(){
+    if(ti>=turns.length){done();return}
+    const T=turns[ti++];
+    const b=document.createElement("div");
+    b.className="bub "+(T.who==="user"?"u":T.who==="tool"?"t":"c");
+    box.appendChild(b);
+    let ci=0;
+    (function type(){
+      if(ci<T.v.length){b.textContent+=T.v[ci];ci+=T.who==="user"?1:2;setTimeout(type,T.who==="user"?26:14)}
+      else{b.textContent=T.v;setTimeout(next,430)}
+    })();
+  }
+  next();
+}
+function playFlow(steps,done){
+  steps.forEach(s=>s.classList.remove("on"));
+  let i=0;
+  (function step(){
+    if(i>=steps.length){done();return}
+    steps[i].classList.add("on");i++;setTimeout(step,900);
+  })();
+}
+
+/* ---------- router ---------- */
+function route(){
+  const h=(location.hash||"#home").slice(1);
+  const p=h.split("/");
+  stopVoice();
+  window.scrollTo(0,0);
+  document.querySelectorAll(".bnav a").forEach(a=>a.classList.toggle("on",a.dataset.nav===p[0]));
+  if(p[0]==="home")return home();
+  if(p[0]==="m")return modulePage(p[1],p[2]||"lessons");
+  if(p[0]==="l")return lessonPage(p[1],p[2]);
+  if(p[0]==="x")return exercisePage(p[1],p[2]);
+  if(p[0]==="q")return quizPage(p[1]);
+  if(p[0]==="mix")return mixPage();
+  if(p[0]==="gloss")return glossPage();
+  if(p[0]==="prog")return progPage();
+  if(p[0]==="search")return searchPage();
+  if(p[0]==="about")return aboutPage();
+  home();
+}
+addEventListener("hashchange",route);
+
+/* ---------- HOME ---------- */
+function nextLesson(){
+  for(const m of MODS)for(const l of m.lessons)if(!S.lessons[lessonKey(m,l)])return{m,l};
+  return null;
+}
+function home(){
+  setBar("קלוד מאסטר",false);
+  const pct=overallPct(),nx=nextLesson();
+  let html='<div class="screen"><div class="card hero"><div class="ring-wrap">'+ring(pct,76)+
+    '<div><h1>קלוד מאסטר</h1><div class="sub">מאפס מוחלט לרמת מומחה — בקצב שלך</div></div></div>'+
+    (nx?'<a class="btn mt wide" style="background:#fff;color:var(--brand2)" href="#l/'+nx.m.id+'/'+nx.l.id+'">▶ המשך: '+esc(nx.l.title)+'</a>'
+       :(MODS.length?'<div class="chip mt" style="background:#fff;color:var(--ok)">🎓 סיימת את כל השיעורים!</div>':""))+
+    '</div>';
+  let lastLevel="";
+  MODS.forEach((m,i)=>{
+    if(m.level&&m.level!==lastLevel){lastLevel=m.level;html+='<div class="sect-h">'+esc(m.level)+'</div>'}
+    const p=modPct(m);
+    html+='<div class="card modcard" onclick="location.hash=\'m/'+m.id+'\'">'+
+      '<div class="mi" style="background:'+(p===100?"var(--ok-soft)":"var(--bg3)")+'">'+m.icon+'</div>'+
+      '<div class="mtx"><b>'+(i+1)+'. '+esc(m.title)+'</b><div class="sub">'+esc(m.subtitle)+'</div>'+
+      '<div class="progress-bar '+(p===100?"ok":"")+'"><i style="width:'+p+'%"></i></div></div>'+
+      '<div class="arr">›</div></div>';
+  });
+  html+='<div class="center mt"><a class="btn ghost" href="#about">אודות · התקנה בטלפון · מקורות</a></div></div>';
+  app.innerHTML=html;
+}
+
+/* ---------- MODULE ---------- */
+function modulePage(mid,tab){
+  const m=modById(mid);if(!m)return home();
+  setBar(m.title,true);
+  const unseen=m.quiz.filter(q=>!S.seen[q.id]).length;
+  const st=S.qstats[m.id]||{a:0,c:0};
+  const hasVid=m.videos&&m.videos.length;
+  let html='<div class="screen"><div class="card"><div style="display:flex;gap:14px;align-items:center">'+
+    '<div style="width:56px;height:56px;border-radius:17px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:30px;flex:none">'+m.icon+'</div>'+
+    '<div><h1 style="font-size:20px">'+esc(m.title)+'</h1><div class="sub">'+esc(m.subtitle)+'</div>'+
+    (m.level?'<span class="chip lvl" style="margin-top:6px">'+esc(m.level)+'</span>':"")+'</div></div></div>'+
+  '<div class="tabs">'+
+    '<button class="'+(tab==="lessons"?"on":"")+'" onclick="location.hash=\'m/'+mid+'/lessons\'">📚 שיעורים</button>'+
+    '<button class="'+(tab==="ex"?"on":"")+'" onclick="location.hash=\'m/'+mid+'/ex\'">🛠️ תרגילים</button>'+
+    '<button class="'+(tab==="quiz"?"on":"")+'" onclick="location.hash=\'m/'+mid+'/quiz\'">🧠 בוחן</button>'+
+    (hasVid?'<button class="'+(tab==="vid"?"on":"")+'" onclick="location.hash=\'m/'+mid+'/vid\'">📺 וידאו</button>':"")+
+  '</div>';
+  if(tab==="lessons"){
+    html+='<div class="card">';
+    m.lessons.forEach((l,i)=>{
+      const done=S.lessons[lessonKey(m,l)];
+      html+='<a class="row '+(done?"done":"")+'" href="#l/'+mid+'/'+l.id+'"><div class="st">'+(done?"✓":i+1)+'</div>'+
+        '<div class="rtx"><b>'+esc(l.title)+'</b><div class="sub">⏱️ '+l.minutes+' דק׳'+
+        (l.demos&&l.demos.length?' · 🎬 '+l.demos.length+' הדגמות':"")+'</div></div></a>';
+    });
+    html+='</div>';
+  }else if(tab==="ex"){
+    if(!m.exercises.length)html+='<div class="card center sub">אין תרגילים במודול זה</div>';
+    else{html+='<div class="card">';
+    m.exercises.forEach((x,i)=>{
+      const done=S.exDone[exKey(m,x)];
+      html+='<a class="row '+(done?"done":"")+'" href="#x/'+mid+'/'+x.id+'"><div class="st">'+(done?"✓":i+1)+'</div>'+
+        '<div class="rtx"><b>'+esc(x.title)+'</b><div class="sub" style="margin-top:3px">'+
+        (x.where==="pc"?'<span class="chip pc">💻 דורש מחשב</span>':'<span class="chip ph">📱 גם מהטלפון</span>')+'</div></div></a>';
+    });
+    html+='</div>';}
+  }else if(tab==="vid"){
+    html+='<div class="box info" style="margin-bottom:14px"><b>ℹ️ הסרטונים הם תוספת, לא חובה</b>כל מה שמופיע בהם מכוסה גם בשיעורי המודול. לסרטונים באנגלית: לחץ על ⚙️ ביוטיוב ← כתוביות ← תרגם אוטומטית ← עברית.</div><div class="card">';
+    m.videos.forEach(v=>{
+      html+='<a class="vid" href="'+v.url+'" target="_blank" rel="noopener"><div class="vth">▶</div>'+
+        '<div class="vtx"><b>'+esc(v.title)+'</b><div class="sub">'+esc(v.channel)+'</div>'+
+        '<div class="vmeta"><span class="chip '+(v.lang==="he"?"ph":"brand")+'">'+(v.lang==="he"?"🇮🇱 עברית":"🇬🇧 אנגלית + כתוביות")+'</span>'+
+        (v.mins?'<span class="chip lvl">⏱️ '+esc(v.mins)+'</span>':"")+'</div>'+
+        '<div class="sub" style="margin-top:6px">'+esc(v.covers)+'</div></div></a>';
+    });
+    html+='</div>';
+  }else{
+    html+='<div class="card center"><div style="font-size:44px">🧠</div><h2>בוחן — '+esc(m.title)+'</h2>'+
+      '<p class="sub">'+m.quiz.length+' שאלות במאגר · '+unseen+' עדיין לא נשאלו<br>'+
+      (st.a?"עד כה ענית נכון על "+st.c+" מתוך "+st.a:"עוד לא ענית על שאלות במודול זה")+'</p>'+
+      (unseen>0?'<button class="btn mt wide" onclick="startQuiz(\''+mid+'\')">התחל בוחן ('+Math.min(10,unseen)+' שאלות)</button>'
+      :'<p class="chip done mt">🎉 ראית את כל השאלות!</p><button class="btn sec mt wide" onclick="resetSeen(\''+mid+'\')">אפס את המאגר</button>')+
+    '</div>';
+  }
+  html+='</div>';
+  app.innerHTML=html;
+}
+
+/* ---------- LESSON ---------- */
+function lessonPage(mid,lid){
+  const m=modById(mid);if(!m)return home();
+  const li=m.lessons.findIndex(l=>l.id===lid);if(li<0)return modulePage(mid,"lessons");
+  const l=m.lessons[li],key=lessonKey(m,l),done=S.lessons[key];
+  setBar(m.title,true);
+  const prev=m.lessons[li-1],next=m.lessons[li+1];
+  const body=l.html.replace(/\[\[demo:(\d+)\]\]/g,'<div class="demo-slot" data-i="$1"></div>');
+  app.innerHTML='<div class="screen">'+
+    '<div class="sub" style="margin-bottom:8px">'+m.icon+' שיעור '+(li+1)+' מתוך '+m.lessons.length+'</div>'+
+    '<h1 style="margin-bottom:14px">'+esc(l.title)+'</h1>'+
+    '<button class="voice-cta" id="voicego"><span class="vi">🔊</span><div><b>הַקְרֵא לי את השיעור</b>'+
+      '<span>המורה הקולי יקריא בעברית — אפשר להאזין תוך כדי הליכה</span></div></button>'+
+    '<div class="lesson">'+body+'</div>'+
+    '<button class="btn wide mt '+(done?"sec":"")+'" id="donebtn">'+(done?"✓ השיעור הושלם":"סיימתי את השיעור ✓")+'</button>'+
+    '<div class="lesson-nav">'+
+      (prev?'<a class="btn sec" href="#l/'+mid+'/'+prev.id+'">→ הקודם</a>':"")+
+      (next?'<a class="btn sec" href="#l/'+mid+'/'+next.id+'">הבא ←</a>':'<a class="btn sec" href="#m/'+mid+'/ex">לתרגילים 🛠️</a>')+
+    '</div></div>';
+  // demos placed inline via [[demo:N]] markers; any left over are appended at the end
+  const demos=l.demos||[], placed=new Set();
+  document.querySelectorAll(".demo-slot").forEach(sl=>{
+    const i=+sl.dataset.i, d=demos[i];
+    if(d){placed.add(i);mountDemo(sl,d)}else sl.remove();
+  });
+  const rest=demos.map((d,i)=>({d,i})).filter(o=>!placed.has(o.i));
+  if(rest.length){
+    const host=$(".lesson");
+    rest.forEach(o=>{const sl=document.createElement("div");host.appendChild(sl);mountDemo(sl,o.d)});
+  }
+  $("#voicego").onclick=startVoice;
+  $("#donebtn").onclick=()=>{
+    if(!S.lessons[key]){S.lessons[key]=1;save();touchStreak();addPts(10);checkAch();
+      toast("⭐ +10 נקודות! כל הכבוד");
+      const b=$("#donebtn");b.textContent="✓ השיעור הושלם";b.classList.add("sec");}
+  };
+}
+
+/* ---------- EXERCISE ---------- */
+function exercisePage(mid,xid){
+  const m=modById(mid);if(!m)return home();
+  const x=m.exercises.find(e=>e.id===xid);if(!x)return modulePage(mid,"ex");
+  const key=exKey(m,x);
+  setBar("תרגיל מעשי",true);
+  let html='<div class="screen"><div class="sub" style="margin-bottom:6px">'+m.icon+' '+esc(m.title)+'</div>'+
+    '<h1>'+esc(x.title)+'</h1><div style="margin:8px 0 14px">'+
+    (x.where==="pc"?'<span class="chip pc">💻 דורש מחשב</span>':'<span class="chip ph">📱 גם מהטלפון</span>')+
+    ' <span class="chip brand">🎯 תרגיל מעשי</span></div>'+
+    '<div class="card"><b>המטרה</b><p class="sub" style="font-size:15px;margin-top:4px">'+esc(x.goal)+'</p></div>'+
+    '<div class="card"><h2 style="margin-top:0">שלבי הביצוע</h2><ol class="steps">'+
+      x.steps.map(s=>"<li>"+esc(s)+"</li>").join("")+'</ol></div>'+
+    '<div class="card"><h2 style="margin-top:0">✅ קריטריוני הצלחה — סמן מה שהשגת</h2>';
+  x.criteria.forEach((c,i)=>{
+    html+='<label class="crit"><input type="checkbox" data-i="'+i+'" '+(S.crit[key+":"+i]?"checked":"")+'><span>'+esc(c)+'</span></label>';
+  });
+  html+='</div><div id="exmsg"></div></div>';
+  app.innerHTML=html;
+  document.querySelectorAll(".crit input").forEach(inp=>{
+    inp.onchange=()=>{
+      const i=inp.dataset.i;
+      if(inp.checked)S.crit[key+":"+i]=1;else delete S.crit[key+":"+i];
+      const all=x.criteria.every((c,j)=>S.crit[key+":"+j]);
+      if(all&&!S.exDone[key]){S.exDone[key]=1;save();touchStreak();addPts(25);checkAch();
+        toast("🏆 תרגיל הושלם! +25 נקודות");
+        $("#exmsg").innerHTML='<div class="card center" style="background:var(--ok-soft);border-color:var(--ok)">'+
+          '<div style="font-size:36px">🏆</div><b>כל הכבוד! השלמת את התרגיל</b></div>';}
+      else if(!all&&S.exDone[key]){delete S.exDone[key];$("#exmsg").innerHTML=""}
+      save();
+    };
+  });
+}
+
+/* ---------- QUIZ ---------- */
+let QZ=null;
+window.startQuiz=function(mid){
+  const mixed=mid==="mix";
+  const pool=mixed?MODS.flatMap(m=>m.quiz.map(q=>Object.assign({},q,{mod:m.id})))
+                  :modById(mid).quiz.map(q=>Object.assign({},q,{mod:mid}));
+  const unseen=pool.filter(q=>!S.seen[q.id]);
+  if(!unseen.length){toast("ראית את כל השאלות — אפס את המאגר");return}
+  QZ={mid:mid,qs:shuffle(unseen).slice(0,10),i:0,c:0,answered:false,optOrder:null};
+  if(location.hash==="#q/"+mid)quizPage(mid);else location.hash="q/"+mid;
+};
+window.resetSeen=function(mid){
+  const pool=mid==="mix"?MODS.flatMap(m=>m.quiz):modById(mid).quiz;
+  pool.forEach(q=>delete S.seen[q.id]);
+  if(mid!=="mix")S.qstats[mid]={a:0,c:0};else S.qstats={};
+  save();toast("המאגר אופס 🔄");route();
+};
+function quizPage(mid){
+  if(!QZ||QZ.mid!==mid){if(mid==="mix")return mixPage();return modulePage(mid,"quiz")}
+  setBar("בוחן",true);
+  const q=QZ.qs[QZ.i];
+  const opts=QZ.optOrder||(QZ.optOrder=shuffle(q.opts.map((o,i)=>i)));
+  app.innerHTML='<div class="screen"><div class="q-head"><span class="chip brand">'+(QZ.i+1)+'/'+QZ.qs.length+'</span>'+
+    '<div class="progress-bar"><i style="width:'+Math.round(100*QZ.i/QZ.qs.length)+'%"></i></div>'+
+    '<span class="chip done">✓ '+QZ.c+'</span></div>'+
+    '<div class="card"><h2 style="margin:0">'+esc(q.q)+'</h2></div>'+
+    '<div id="opts">'+opts.map(oi=>'<button class="q-opt" data-oi="'+oi+'">'+esc(q.opts[oi])+'</button>').join("")+'</div>'+
+    '<div id="qfoot"></div></div>';
+  document.querySelectorAll(".q-opt").forEach(btn=>{
+    btn.onclick=()=>{
+      if(QZ.answered)return;QZ.answered=true;
+      const oi=+btn.dataset.oi,ok=oi===q.a;
+      if(ok){QZ.c++;btn.classList.add("sel-ok");addPts(5)}
+      else{btn.classList.add("sel-err");const r=document.querySelector('.q-opt[data-oi="'+q.a+'"]');if(r)r.classList.add("reveal")}
+      document.querySelectorAll(".q-opt").forEach(b=>b.disabled=true);
+      S.seen[q.id]=1;
+      const st=S.qstats[q.mod]||(S.qstats[q.mod]={a:0,c:0});st.a++;if(ok)st.c++;
+      save();touchStreak();checkAch();
+      $("#qfoot").innerHTML='<div class="q-exp '+(ok?"good":"bad")+'"><b>'+(ok?"✓ נכון!":"✗ לא מדויק.")+'</b> '+esc(q.exp)+'</div>'+
+        '<button class="btn wide" id="nextq">'+(QZ.i+1<QZ.qs.length?"לשאלה הבאה ←":"סיום הבוחן 🏁")+'</button>';
+      $("#nextq").onclick=()=>{
+        QZ.i++;QZ.answered=false;QZ.optOrder=null;
+        if(QZ.i<QZ.qs.length)quizPage(mid);else quizEnd();
+      };
+      $("#nextq").scrollIntoView({behavior:"smooth",block:"end"});
+    };
+  });
+}
+function quizEnd(){
+  const n=QZ.qs.length,c=QZ.c,pct=Math.round(100*c/n);
+  const msg=pct===100?"מושלם! שליטה מלאה 🏆":pct>=80?"מצוין! אתה בדרך הנכונה 🌟":pct>=60?"יפה! שווה לחזור על השיעורים 💪":"התחלה טובה — חזור על השיעורים ונסה שוב 📚";
+  const mid=QZ.mid;QZ=null;
+  setBar("תוצאות",true);
+  app.innerHTML='<div class="screen"><div class="card center">'+
+    '<div style="font-size:44px">'+(pct>=80?"🏆":pct>=60?"🌟":"📚")+'</div>'+
+    '<div class="score-big">'+c+'/'+n+'</div><p class="sub">'+msg+'</p>'+
+    '<button class="btn wide mt" onclick="startQuiz(\''+mid+'\')">סבב נוסף 🔄</button>'+
+    '<a class="btn sec wide mt" href="'+(mid==="mix"?"#mix":"#m/"+mid+"/quiz")+'">חזרה</a></div></div>';
+}
+
+/* ---------- MIXED ---------- */
+function mixPage(){
+  setBar("תרגול מעורב",false);
+  const all=MODS.flatMap(m=>m.quiz);
+  const unseen=all.filter(q=>!S.seen[q.id]).length;
+  const t=qTotals();
+  app.innerHTML='<div class="screen"><div class="card hero"><h1>🎯 תרגול מעורב</h1>'+
+    '<div class="sub">שאלות אקראיות מכל המודולים — בלי חזרות. הדרך הטובה ביותר לוודא שהידע יושב.</div></div>'+
+    '<div class="grid2">'+
+      '<div class="stat"><b>'+all.length+'</b><span>שאלות במאגר</span></div>'+
+      '<div class="stat"><b>'+unseen+'</b><span>עוד לא נשאלו</span></div>'+
+      '<div class="stat"><b>'+t.a+'</b><span>נענו עד כה</span></div>'+
+      '<div class="stat"><b>'+(t.a?Math.round(100*t.c/t.a):0)+'%</b><span>דיוק</span></div>'+
+    '</div>'+
+    (unseen>0?'<button class="btn wide mt" onclick="startQuiz(\'mix\')">התחל סבב תרגול ('+Math.min(10,unseen)+' שאלות)</button>'
+    :'<div class="card center mt"><b>🎉 ענית על כל השאלות!</b><button class="btn sec wide mt" onclick="resetSeen(\'mix\')">אפס הכול</button></div>')+
+  '</div>';
+}
+
+/* ---------- GLOSSARY ---------- */
+function glossPage(){
+  setBar("מילון מונחים",false);
+  app.innerHTML='<div class="screen"><input class="search" id="gs" placeholder="🔍 חפש מונח… (עברית או אנגלית)">'+
+    '<div class="card" id="glist"></div></div>';
+  const render=f=>{
+    const terms=GLOSS.filter(g=>!f||g.he.includes(f)||g.en.toLowerCase().includes(f.toLowerCase())||g.def.includes(f));
+    $("#glist").innerHTML=terms.length?terms.map(g=>'<div class="gterm"><b>'+esc(g.he)+'</b> <span class="gen">'+esc(g.en)+
+      '</span><p>'+esc(g.def)+'</p></div>').join(""):'<p class="sub center">לא נמצאו מונחים</p>';
+  };
+  render("");
+  $("#gs").oninput=e=>render(e.target.value.trim());
+}
+
+/* ---------- SEARCH ---------- */
+let IDX=null;
+function buildIndex(){
+  if(IDX)return IDX;
+  IDX=[];
+  const tmp=document.createElement("div");
+  MODS.forEach(m=>{
+    m.lessons.forEach(l=>{
+      tmp.innerHTML=l.html;
+      IDX.push({k:"שיעור",t:l.title,s:m.title,u:"#l/"+m.id+"/"+l.id,txt:(l.title+" "+tmp.textContent).replace(/\s+/g," ")});
+    });
+    m.exercises.forEach(x=>{
+      IDX.push({k:"תרגיל",t:x.title,s:m.title,u:"#x/"+m.id+"/"+x.id,txt:x.title+" "+x.goal+" "+x.steps.join(" ")});
+    });
+  });
+  GLOSS.forEach(g=>IDX.push({k:"מונח",t:g.he+" — "+g.en,s:"מילון",u:"#gloss",txt:g.he+" "+g.en+" "+g.def}));
+  return IDX;
+}
+function searchPage(){
+  setBar("חיפוש",true);
+  app.innerHTML='<div class="screen"><input class="search" id="ss" placeholder="🔍 חפש בכל הקורס — שיעורים, תרגילים ומונחים" autofocus>'+
+    '<div id="sres"></div></div>';
+  const inp=$("#ss");
+  inp.oninput=()=>{
+    const f=inp.value.trim();
+    if(f.length<2){$("#sres").innerHTML='<p class="sub center">הקלד לפחות 2 תווים…</p>';return}
+    const idx=buildIndex();
+    const res=idx.filter(r=>r.txt.includes(f)).slice(0,40);
+    if(!res.length){$("#sres").innerHTML='<p class="sub center">לא נמצאו תוצאות עבור "'+esc(f)+'"</p>';return}
+    $("#sres").innerHTML='<div class="sub" style="margin-bottom:8px">'+res.length+' תוצאות</div><div class="card">'+
+      res.map(r=>{
+        const i=r.txt.indexOf(f);
+        const snip=esc(r.txt.slice(Math.max(0,i-45),i+75)).replace(esc(f),"<mark>"+esc(f)+"</mark>");
+        return '<a class="row" href="'+r.u+'"><div class="st">'+(r.k==="שיעור"?"📚":r.k==="תרגיל"?"🛠️":"📖")+'</div>'+
+          '<div class="rtx"><b>'+esc(r.t)+'</b><div class="sub">'+esc(r.s)+'</div>'+
+          '<div class="sub" style="margin-top:4px">…'+snip+'…</div></div></a>';
+      }).join("")+'</div>';
+  };
+  setTimeout(()=>inp.focus(),120);
+}
+
+/* ---------- PROGRESS ---------- */
+function progPage(){
+  setBar("ההתקדמות שלי",false);
+  const pct=overallPct(),t=qTotals();
+  let html='<div class="screen"><div class="card hero"><div class="ring-wrap">'+ring(pct,76)+
+    '<div><h1>ההתקדמות שלי</h1><div class="sub">⭐ '+S.pts+' נקודות'+(S.streak.n?' · 🔥 '+S.streak.n+' ימים ברצף':"")+'</div></div></div></div>'+
+    '<div class="grid2">'+
+      '<div class="stat"><b>'+doneLessons()+'/'+totLessons()+'</b><span>שיעורים</span></div>'+
+      '<div class="stat"><b>'+doneEx()+'/'+totEx()+'</b><span>תרגילים</span></div>'+
+      '<div class="stat"><b>'+t.a+'</b><span>שאלות נענו</span></div>'+
+      '<div class="stat"><b>'+(t.a?Math.round(100*t.c/t.a):0)+'%</b><span>דיוק</span></div>'+
+    '</div>'+
+    '<div class="sect-h">🏆 הישגים ('+Object.keys(S.ach).length+'/'+ACH.length+')</div><div class="ach-grid">'+
+    ACH.map(a=>'<div class="ach '+(S.ach[a.id]?"got":"")+'"><span class="ai">'+a.i+'</span><b>'+esc(a.t)+'</b></div>').join("")+
+    '</div><div class="sect-h">📊 לפי מודול</div><div class="card">';
+  MODS.forEach((m,i)=>{
+    const p=modPct(m);
+    html+='<a class="row" href="#m/'+m.id+'"><div style="font-size:22px">'+m.icon+'</div>'+
+      '<div class="rtx"><b>'+(i+1)+'. '+esc(m.title)+'</b>'+
+      '<div class="progress-bar '+(p===100?"ok":"")+'" style="margin-top:6px"><i style="width:'+p+'%"></i></div></div>'+
+      '<span class="chip '+(p===100?"done":"brand")+'">'+p+'%</span></a>';
+  });
+  html+='</div><div class="center mt"><button class="btn ghost" style="color:var(--err)" id="resetall">🗑️ איפוס כל ההתקדמות</button></div></div>';
+  app.innerHTML=html;
+  $("#resetall").onclick=()=>{if(confirm("לאפס את כל ההתקדמות? פעולה זו אינה הפיכה."))
+    {localStorage.removeItem(KEY);location.reload()}};
+}
+
+/* ---------- ABOUT ---------- */
+let deferredPrompt=null;
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e});
+function aboutPage(){
+  setBar("אודות",true);
+  app.innerHTML='<div class="screen">'+
+  '<div class="card"><h2 style="margin-top:0">📱 קלוד מאסטר</h2><p class="sub">קורס אינטראקטיבי מקיף בעברית ללימוד ותרגול של כל יכולות קלוד — מהצעד הראשון ועד רמת מומחה. התוכן מבוסס על הדוקומנטציה הרשמית של Anthropic, מאמרי ההנדסה שלה, ומקורות מקצועיים נוספים — נכון לאוגוסט 2026.</p></div>'+
+  '<div class="card"><h2 style="margin-top:0">התקנה כאפליקציה</h2><p class="sub">כשהאפליקציה יושבת על כתובת אינטרנט אפשר להתקין אותה במסך הבית:</p>'+
+  '<ul style="padding-right:20px;font-size:15px;color:var(--ink2)">'+
+  '<li><b>אנדרואיד (Chrome):</b> תפריט ⋮ ← "התקנת אפליקציה"</li>'+
+  '<li><b>אייפון (Safari):</b> כפתור שיתוף ← "הוסף למסך הבית"</li>'+
+  '<li><b>מחשב (Chrome/Edge):</b> אייקון ההתקנה בשורת הכתובת</li></ul><div id="installwrap"></div></div>'+
+  '<div class="card"><h2 style="margin-top:0">🔊 על המורה הקולי</h2><p class="sub">ההקראה מופקת על ידי מנוע הדיבור המובנה של המכשיר שלך — לא הקלטה של קריין אנושי. האיכות משתנה בין מכשירים: באנדרואיד ובאייפון היא בדרך כלל טובה, ב-Windows פחות. הכול קורה במכשיר, בלי אינטרנט.</p></div>'+
+  '<div class="card"><h2 style="margin-top:0">📚 מקורות</h2><p class="sub">code.claude.com/docs · claude.com/docs · platform.claude.com/docs · support.claude.com · anthropic.com/engineering · academy.claude.com</p></div>'+
+  '<div class="card"><h2 style="margin-top:0">🔒 הנתונים שלך</h2><p class="sub">כל ההתקדמות נשמרת מקומית במכשיר הזה בלבד. שום מידע לא נשלח לשום מקום.</p></div></div>';
+  if(deferredPrompt){
+    $("#installwrap").innerHTML='<button class="btn wide mt" id="doinstall">⬇️ התקן עכשיו</button>';
+    $("#doinstall").onclick=async()=>{deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;
+      const b=$("#doinstall");if(b)b.remove()};
+  }
+}
+
+/* ---------- SW ---------- */
+if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
+  addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})});
+}
+paintBar();
+route();
+})();
+</script>
+</body>
+</html>
