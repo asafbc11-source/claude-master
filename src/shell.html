@@ -174,6 +174,71 @@ table.cmp td{padding:8px 10px;border:1px solid var(--line);vertical-align:top}
 .tbl-wrap table.cmp{margin:0;min-width:460px}
 .lesson-nav{display:flex;gap:10px;margin-top:16px}
 .lesson-nav .btn{flex:1}
+/* ---------- Ask-Claude buttons on prompt examples ---------- */
+.px-bar{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.px-btn{border:none;background:var(--brand);color:#fff;border-radius:9px;padding:5px 12px;font-family:inherit;
+  font-size:12.5px;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.px-btn.sec{background:var(--bg4);color:var(--ink2)}
+.px-btn:active{transform:scale(.95)}
+/* ---------- Chat drawer ---------- */
+.fab{position:fixed;bottom:calc(78px + env(safe-area-inset-bottom));left:16px;z-index:46;width:54px;height:54px;
+  border-radius:50%;border:none;background:var(--brand);color:#fff;font-size:24px;cursor:pointer;
+  box-shadow:0 4px 16px rgba(201,100,66,.42);display:flex;align-items:center;justify-content:center;
+  transition:transform .18s cubic-bezier(.2,1.4,.4,1)}
+.fab:active{transform:scale(.9)}
+body.has-voice .fab{bottom:calc(150px + env(safe-area-inset-bottom))}
+.sheet{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center;
+  background:rgba(20,12,8,.45);backdrop-filter:blur(3px);animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.sheet-in{background:var(--bg);width:100%;max-width:780px;height:88dvh;border-radius:22px 22px 0 0;
+  display:flex;flex-direction:column;overflow:hidden;animation:up .28s cubic-bezier(.2,.9,.3,1);
+  padding-bottom:env(safe-area-inset-bottom)}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);flex:none}
+.sheet-head b{flex:1;font-size:16.5px}
+.sheet-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
+.sheet-foot{flex:none;border-top:1px solid var(--line);padding:10px 12px;display:flex;gap:8px;align-items:flex-end}
+.sheet-foot textarea{flex:1;font-family:inherit;font-size:16px;background:var(--bg2);border:1.5px solid var(--line);
+  border-radius:14px;padding:10px 13px;color:var(--ink);resize:none;max-height:120px;line-height:1.5}
+.sheet-foot textarea:focus{outline:none;border-color:var(--brand)}
+.send{border:none;background:var(--brand);color:#fff;width:44px;height:44px;border-radius:50%;font-size:18px;
+  cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center}
+.send[disabled]{opacity:.4}
+.cmsg{max-width:88%;padding:10px 14px;border-radius:16px;font-size:15.5px;line-height:1.65;margin-bottom:10px;
+  white-space:pre-wrap;word-break:break-word;animation:in .22s ease}
+.cmsg.me{background:var(--brand);color:#fff;margin-inline-start:auto;border-bottom-right-radius:5px}
+.cmsg.ai{background:var(--bg2);border:1px solid var(--line);border-bottom-left-radius:5px}
+.cmsg.err{background:var(--err-soft);color:var(--err);font-size:14.5px}
+.cmsg .code{margin:8px 0;font-size:13px}
+.typing span{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ink3);margin-inline-end:3px;
+  animation:bounce 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,60%,100%{transform:none;opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.keyform{max-width:460px;margin:0 auto}
+.keyform input{width:100%;font-family:Consolas,monospace;font-size:14px;direction:ltr;text-align:left;
+  background:var(--bg2);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;color:var(--ink);margin-bottom:10px}
+.keyform input:focus{outline:none;border-color:var(--brand)}
+.suggest{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.suggest button{border:1px solid var(--line);background:var(--bg2);color:var(--ink2);border-radius:99px;
+  padding:7px 13px;font-family:inherit;font-size:13px;cursor:pointer}
+.suggest button:active{background:var(--bg3)}
+.devinfo{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;font-size:14.5px;margin-top:8px}
+.devinfo dt{color:var(--ink2)}
+.devinfo dd{font-weight:700}
+/* ---------- How-to (setup guide) ---------- */
+.howto{border:1.5px solid var(--brand);border-radius:var(--rs);margin:0 0 16px;overflow:hidden;background:var(--bg2)}
+.howto>b{display:block;background:var(--brand-soft);color:var(--brand);padding:10px 14px;font-size:15px}
+.ht-in{padding:13px 14px 12px}
+.ht-req{font-size:13.5px;color:var(--ink2);background:var(--bg3);border-radius:9px;padding:8px 12px;margin-bottom:11px;line-height:1.55}
+.ht-steps{counter-reset:h;list-style:none;padding:0;margin:0 0 11px}
+.ht-steps li{counter-increment:h;position:relative;padding:0 33px 11px 0;font-size:15px;line-height:1.6}
+.ht-steps li:last-child{padding-bottom:2px}
+.ht-steps li::before{content:counter(h);position:absolute;right:0;top:2px;width:23px;height:23px;border-radius:50%;
+  background:var(--brand);color:#fff;font-size:12.5px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.ht-check{background:var(--ok-soft);border-radius:9px;padding:9px 12px;font-size:14.5px;margin-bottom:8px;line-height:1.55}
+.ht-fix{background:var(--warn-soft);border-radius:9px;padding:9px 12px;font-size:14.5px;line-height:1.55}
+.howto .code{margin:6px 0 8px;font-size:13px}
+
 /* ---------- Demos ---------- */
 .demo{border:1.5px solid var(--line);border-radius:var(--rs);overflow:hidden;margin:0 0 16px;background:var(--bg3)}
 .demo-head{display:flex;align-items:center;gap:9px;padding:10px 13px;background:var(--bg4);font-size:13.5px;font-weight:800;color:var(--ink2)}
@@ -319,6 +384,8 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 2px}
 </div></div>
 
 <main id="app"></main>
+
+<button class="fab" id="chatfab" aria-label="שאל את קלוד" title="שאל את קלוד">💬</button>
 
 <nav class="bnav"><div class="bnav-in">
   <a href="#home" data-nav="home"><span class="bi">🏠</span>בית</a>
@@ -718,6 +785,8 @@ function lessonPage(mid,lid){
     const host=$(".lesson");
     rest.forEach(o=>{const sl=document.createElement("div");host.appendChild(sl);mountDemo(sl,o.d)});
   }
+  enhancePromptExamples($(".lesson"));
+  applyDeviceHints($(".lesson"));
   $("#voicego").onclick=startVoice;
   $("#donebtn").onclick=()=>{
     if(!S.lessons[key]){S.lessons[key]=1;save();touchStreak();addPts(10);checkAch();
@@ -745,6 +814,8 @@ function exercisePage(mid,xid){
   });
   html+='</div><div id="exmsg"></div></div>';
   app.innerHTML=html;
+  enhancePromptExamples(app);
+  applyDeviceHints(app);
   document.querySelectorAll(".crit input").forEach(inp=>{
     inp.onchange=()=>{
       const i=inp.dataset.i;
@@ -936,13 +1007,236 @@ function aboutPage(){
   '<li><b>מחשב (Chrome/Edge):</b> אייקון ההתקנה בשורת הכתובת</li></ul><div id="installwrap"></div></div>'+
   '<div class="card"><h2 style="margin-top:0">🔊 על המורה הקולי</h2><p class="sub">ההקראה מופקת על ידי מנוע הדיבור המובנה של המכשיר שלך — לא הקלטה של קריין אנושי. האיכות משתנה בין מכשירים: באנדרואיד ובאייפון היא בדרך כלל טובה, ב-Windows פחות. הכול קורה במכשיר, בלי אינטרנט.</p></div>'+
   '<div class="card"><h2 style="margin-top:0">📚 מקורות</h2><p class="sub">code.claude.com/docs · claude.com/docs · platform.claude.com/docs · support.claude.com · anthropic.com/engineering · academy.claude.com</p></div>'+
+  '<div class="card"><h2 style="margin-top:0">💬 שאל את קלוד מתוך האפליקציה</h2>'+
+  '<p class="sub">כפתור השיחה 💬 פותח מורה אישי שמכיר את הקורס ואת השיעור שאתה נמצא בו. הוא דורש <b>מפתח API אישי</b> (חשבון נפרד ממנוי Pro, בתשלום לפי שימוש) שנשמר רק במכשיר שלך.<br><br>'+
+  'לא רוצה מפתח? בכל דוגמת פרומפט בקורס יש כפתור <b>"פתח את זה בקלוד"</b> שמעביר אותך לשיחה עם הטקסט מוכן — בחינם, עם המנוי הרגיל.</p></div>'+
+  '<div class="card"><h2 style="margin-top:0">📱 המכשיר שלך</h2>'+
+  '<p class="sub">האפליקציה מזהה את המכשיר כדי להתאים את ההוראות. זה כל מה שדפדפן מאפשר לה לדעת — ואין לה שום גישה לקבצים, לאנשי קשר או לאפליקציות אחרות.</p>'+
+  '<dl class="devinfo" id="devlist"></dl></div>'+
   '<div class="card"><h2 style="margin-top:0">🔒 הנתונים שלך</h2><p class="sub">כל ההתקדמות נשמרת מקומית במכשיר הזה בלבד. שום מידע לא נשלח לשום מקום.</p></div></div>';
+  const hv=hebrewVoice();
+  const rows=[
+    ["מערכת הפעלה", DEV.os],
+    ["דפדפן", DEV.browser],
+    ["סוג מכשיר", DEV.mobile?"נייד":"מחשב"],
+    ["מותקן כאפליקציה", DEV.installed?"כן ✓":"לא — עדיין בדפדפן"],
+    ["מורה קולי בעברית", hv?("זמין ✓ ("+hv+")"):"לא נמצא קול עברי במכשיר"],
+    ["עבודה אופליין", ("serviceWorker" in navigator)?"נתמכת ✓":"לא נתמכת"],
+    ["חיבור לאינטרנט", navigator.onLine?"מחובר":"מנותק"]
+  ];
+  $("#devlist").innerHTML=rows.map(r=>"<dt>"+esc(r[0])+"</dt><dd>"+esc(r[1])+"</dd>").join("");
   if(deferredPrompt){
     $("#installwrap").innerHTML='<button class="btn wide mt" id="doinstall">⬇️ התקן עכשיו</button>';
     $("#doinstall").onclick=async()=>{deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;
       const b=$("#doinstall");if(b)b.remove()};
   }
 }
+
+/* ================== DEVICE ================== */
+const DEV=(function(){
+  const ua=navigator.userAgent||"";
+  const os = /Windows/.test(ua) ? "Windows"
+           : /Android/.test(ua) ? "Android"
+           : /iPhone|iPad|iPod/.test(ua) ? "iOS"
+           : /Mac OS X/.test(ua) ? "macOS"
+           : /Linux/.test(ua) ? "Linux" : "לא ידוע";
+  const br = /Edg\//.test(ua) ? "Edge" : /Chrome\//.test(ua) ? "Chrome"
+           : /Safari\//.test(ua) ? "Safari" : /Firefox\//.test(ua) ? "Firefox" : "אחר";
+  return {os:os, browser:br, mobile:/Android|iPhone|iPad|iPod/.test(ua),
+    installed: matchMedia("(display-mode: standalone)").matches || navigator.standalone===true,
+    touch:(navigator.maxTouchPoints||0)>0};
+})();
+/* content marked data-os shows only on the matching platform */
+function applyDeviceHints(root){
+  root.querySelectorAll("[data-os]").forEach(el=>{
+    const want=el.getAttribute("data-os").split(",").map(s=>s.trim());
+    el.style.display = want.includes(DEV.os) ? "" : "none";
+  });
+}
+function hebrewVoice(){
+  if(!("speechSynthesis" in window))return null;
+  const v=(speechSynthesis.getVoices()||[]).find(x=>/^he/i.test(x.lang));
+  return v?v.name:null;
+}
+
+/* ================== ASK CLAUDE (deep links) ================== */
+const CLAUDE_NEW="https://claude.ai/new?q=";
+function enhancePromptExamples(root){
+  root.querySelectorAll(".prompt-ex").forEach(px=>{
+    if(px.querySelector(".px-bar"))return;
+    const label=px.querySelector(".pl");
+    const text=[...px.childNodes].filter(n=>n!==label)
+      .map(n=>n.textContent||"").join("").replace(/\s+/g," ").trim();
+    if(text.length<15)return;
+    const bar=document.createElement("div");
+    bar.className="px-bar";
+    const open=document.createElement("a");
+    open.className="px-btn"; open.target="_blank"; open.rel="noopener";
+    open.href=CLAUDE_NEW+encodeURIComponent(text);
+    open.textContent="✨ פתח את זה בקלוד";
+    const copy=document.createElement("button");
+    copy.className="px-btn sec"; copy.textContent="העתק";
+    copy.onclick=()=>{
+      navigator.clipboard.writeText(text).then(()=>{copy.textContent="✓ הועתק";
+        setTimeout(()=>copy.textContent="העתק",1600)}).catch(()=>toast("ההעתקה נחסמה בדפדפן"));
+    };
+    bar.appendChild(open); bar.appendChild(copy);
+    px.appendChild(bar);
+  });
+}
+
+/* ================== IN-APP CHAT (viewer's own API key) ================== */
+const CHAT={open:false,msgs:[],busy:false};
+const KEYSTORE="claude_master_key";
+function getKey(){try{return localStorage.getItem(KEYSTORE)||""}catch(e){return""}}
+function setKey(k){try{k?localStorage.setItem(KEYSTORE,k):localStorage.removeItem(KEYSTORE)}catch(e){}}
+function chatContext(){
+  const h=(location.hash||"").slice(1).split("/");
+  if(h[0]==="l"){
+    const m=modById(h[1]), l=m&&m.lessons.find(x=>x.id===h[2]);
+    if(l)return "המשתמש נמצא כרגע בשיעור \""+l.title+"\" במודול \""+m.title+"\".";
+  }
+  if(h[0]==="x"){
+    const m=modById(h[1]), x=m&&m.exercises.find(e=>e.id===h[2]);
+    if(x)return "המשתמש עובד כרגע על התרגיל \""+x.title+"\": "+x.goal;
+  }
+  return "";
+}
+const SYSTEM=
+"אתה המורה האישי בתוך אפליקציית 'קלוד מאסטר' — קורס בעברית שמלמד לעבוד עם קלוד מאפס ועד רמת מומחה. "+
+"ענה תמיד בעברית פשוטה וברורה, והסבר כל מונח טכני בפעם הראשונה שהוא מופיע. "+
+"הלומד מתחיל בלי ידע טכני מוקדם, עובד על Windows, ויש לו מנוי Claude Pro. "+
+"תן תשובות קצרות ומעשיות, עם צעד אחד קונקרטי שאפשר לבצע עכשיו. אל תמציא יכולות שאינך בטוח בהן.";
+function openChat(){
+  if(CHAT.open)return;
+  CHAT.open=true;
+  const sh=document.createElement("div");
+  sh.className="sheet"; sh.id="chatsheet";
+  sh.innerHTML='<div class="sheet-in">'+
+    '<div class="sheet-head"><span style="font-size:20px">💬</span><b>שאל את קלוד</b>'+
+      '<button class="iconbtn" id="chatkey" title="הגדרות מפתח">⚙️</button>'+
+      '<button class="iconbtn" id="chatclose" aria-label="סגור">✕</button></div>'+
+    '<div class="sheet-body" id="chatbody"></div>'+
+    '<div class="sheet-foot" id="chatfoot" style="display:none">'+
+      '<textarea id="chatinput" rows="1" placeholder="שאל כל שאלה על החומר…"></textarea>'+
+      '<button class="send" id="chatsend">↑</button></div>'+
+  '</div>';
+  document.body.appendChild(sh);
+  sh.onclick=e=>{if(e.target===sh)closeChat()};
+  $("#chatclose").onclick=closeChat;
+  $("#chatkey").onclick=()=>renderKeyForm(true);
+  if(getKey())renderChat(); else renderKeyForm(false);
+}
+function closeChat(){CHAT.open=false;const s=$("#chatsheet");if(s)s.remove()}
+function renderKeyForm(fromSettings){
+  const body=$("#chatbody"); if(!body)return;
+  $("#chatfoot").style.display="none";
+  const has=!!getKey();
+  body.innerHTML='<div class="keyform">'+
+    '<div class="box info"><b>ℹ️ איך השיחה כאן עובדת</b>האפליקציה הזו היא דף עצמאי, ולכן כדי לדבר עם קלוד מתוכה נדרש <b>מפתח API אישי</b> — חשבון נפרד ממנוי Pro, עם חיוב לפי שימוש בפועל.</div>'+
+    '<div class="box tip"><b>🔒 המפתח נשאר אצלך</b>הוא נשמר רק בדפדפן של המכשיר הזה, לא נשלח לשום מקום מלבד שרתי Anthropic, ואף אחד אחר — כולל מי ששיתף לך את האפליקציה — לא יכול לראות אותו.</div>'+
+    '<div class="box warn"><b>💡 לא רוצה מפתח? יש דרך חינמית</b>בכל דוגמת פרומפט בקורס יש כפתור <b>"פתח את זה בקלוד"</b> שמעביר אותך ישירות לשיחה עם קלוד עם הטקסט מוכן — בלי מפתח, בלי עלות, עם המנוי הרגיל שלך.</div>'+
+    '<p class="sub" style="margin:14px 0 8px">להשגת מפתח: היכנס ל-<a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener" style="color:var(--brand)">platform.claude.com</a> ← Create Key. הדבק אותו כאן:</p>'+
+    '<input id="keyinput" type="password" placeholder="sk-ant-..." autocomplete="off" value="">'+
+    '<button class="btn wide" id="keysave">שמור והתחל לדבר</button>'+
+    (has?'<button class="btn ghost wide mt" id="keyclear" style="color:var(--err)">מחק את המפתח מהמכשיר</button>':'')+
+    (fromSettings&&has?'<button class="btn sec wide mt" id="keyback">חזרה לשיחה</button>':'')+
+  '</div>';
+  $("#keysave").onclick=()=>{
+    const v=$("#keyinput").value.trim();
+    if(!v){toast("לא הוזן מפתח");return}
+    if(!/^sk-ant-/.test(v)){toast("מפתח לא תקין — הוא מתחיל ב-sk-ant-");return}
+    setKey(v); CHAT.msgs=[]; renderChat(); toast("המפתח נשמר במכשיר");
+  };
+  const kc=$("#keyclear"); if(kc)kc.onclick=()=>{setKey("");CHAT.msgs=[];renderKeyForm(false);toast("המפתח נמחק")};
+  const kb=$("#keyback"); if(kb)kb.onclick=renderChat;
+}
+function renderChat(){
+  const body=$("#chatbody"); if(!body)return;
+  $("#chatfoot").style.display="flex";
+  if(!CHAT.msgs.length){
+    body.innerHTML='<div class="center sub" style="padding:18px 6px">'+
+      '<div style="font-size:34px">💬</div><p style="margin-top:6px">שאל אותי כל דבר על החומר — אני מכיר את הקורס ואת השיעור שאתה נמצא בו.</p></div>'+
+      '<div class="suggest">'+
+      ['הסבר לי את השיעור הזה במילים פשוטות','תן לי דוגמה מהחיים שלי','אני תקוע — מה לעשות?','בחן אותי על מה שלמדתי']
+        .map(s=>'<button>'+s+'</button>').join("")+'</div>';
+    body.querySelectorAll(".suggest button").forEach(b=>b.onclick=()=>{$("#chatinput").value=b.textContent;sendChat()});
+  }else{
+    body.innerHTML=CHAT.msgs.map(m=>'<div class="cmsg '+(m.role==="user"?"me":"ai")+'">'+esc(m.content)+'</div>').join("");
+    body.scrollTop=body.scrollHeight;
+  }
+  const inp=$("#chatinput");
+  inp.oninput=()=>{inp.style.height="auto";inp.style.height=Math.min(inp.scrollHeight,120)+"px"};
+  inp.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChat()}};
+  $("#chatsend").onclick=sendChat;
+}
+async function sendChat(){
+  if(CHAT.busy)return;
+  const inp=$("#chatinput"); const text=inp.value.trim();
+  if(!text)return;
+  const key=getKey(); if(!key){renderKeyForm(false);return}
+  CHAT.msgs.push({role:"user",content:text});
+  inp.value=""; inp.style.height="auto";
+  const body=$("#chatbody");
+  if(CHAT.msgs.length===1)body.innerHTML="";
+  body.insertAdjacentHTML("beforeend",'<div class="cmsg me">'+esc(text)+'</div>');
+  const bubble=document.createElement("div");
+  bubble.className="cmsg ai";
+  bubble.innerHTML='<span class="typing"><span></span><span></span><span></span></span>';
+  body.appendChild(bubble); body.scrollTop=body.scrollHeight;
+  CHAT.busy=true; $("#chatsend").disabled=true;
+  const ctx=chatContext();
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"content-type":"application/json","x-api-key":key,
+        "anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+      body:JSON.stringify({model:"claude-sonnet-5",max_tokens:1200,
+        system:SYSTEM+(ctx?" "+ctx:""),
+        messages:CHAT.msgs.map(m=>({role:m.role,content:m.content})),stream:true})
+    });
+    if(!res.ok){
+      let msg="שגיאה "+res.status;
+      if(res.status===401)msg="המפתח נדחה. בדוק שהעתקת אותו במלואו, או צור מפתח חדש.";
+      else if(res.status===400)msg="הבקשה נדחתה. ייתכן שהיתרה בחשבון ה-API נגמרה.";
+      else if(res.status===429)msg="הגעת למגבלת קצב. המתן רגע ונסה שוב.";
+      else{try{const j=await res.json();if(j.error&&j.error.message)msg+=" — "+j.error.message}catch(e){}}
+      throw new Error(msg);
+    }
+    const reader=res.body.getReader(), dec=new TextDecoder();
+    let buf="", acc="";
+    bubble.textContent="";
+    while(true){
+      const {done,value}=await reader.read();
+      if(done)break;
+      buf+=dec.decode(value,{stream:true});
+      const lines=buf.split("\n"); buf=lines.pop();
+      for(const line of lines){
+        if(!line.startsWith("data:"))continue;
+        const payload=line.slice(5).trim();
+        if(!payload||payload==="[DONE]")continue;
+        try{
+          const ev=JSON.parse(payload);
+          if(ev.type==="content_block_delta"&&ev.delta&&ev.delta.text){
+            acc+=ev.delta.text; bubble.textContent=acc; body.scrollTop=body.scrollHeight;
+          }
+        }catch(e){}
+      }
+    }
+    if(!acc)acc="(לא התקבלה תשובה)";
+    bubble.textContent=acc;
+    CHAT.msgs.push({role:"assistant",content:acc});
+  }catch(err){
+    bubble.className="cmsg err";
+    const off=!navigator.onLine?"אין חיבור לאינטרנט. ":"";
+    bubble.textContent="⚠️ "+off+(err.message||"לא הצלחתי להתחבר");
+    CHAT.msgs.pop();
+  }finally{
+    CHAT.busy=false; const s=$("#chatsend"); if(s)s.disabled=false;
+    body.scrollTop=body.scrollHeight;
+  }
+}
+$("#chatfab").onclick=openChat;
 
 /* ---------- SW ---------- */
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){
