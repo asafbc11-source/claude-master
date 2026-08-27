@@ -1,4 +1,4 @@
-﻿const CACHE = "claude-master-v5";
+﻿const CACHE = "claude-master-v6";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 // Install: cache app shell, bypassing HTTP cache so updates always land fresh

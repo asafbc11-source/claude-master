@@ -4646,8 +4646,15 @@ check:`הרץ <span class="kbd">/mcp</span> — השרת מופיע כמחובר
 fix:`מופיע כמנותק? בדוק חיבור אינטרנט ואת נכונות הכתובת. אם נדרש אימות — הרץ את פקודת ההתחברות שוב.`});
 
 /* ============ מודול 9 — API ============ */
+/* The API module is the only place a paid account comes up — say so plainly. */
+(function(){
+  const m = by("m9"), l = m && m.lessons.find(x => x.id === "l2");
+  if(l) l.html = '<div class="box tip"><b>💰 רגע לפני שנתחיל — האם אתה חייב לשלם?</b>'+
+    '<b>לא.</b> מנוי Claude שלך מכסה את כל שאר הקורס. המודול הזה מלמד את ה-API — הדרך שבה מפתחים בונים מוצרים על קלוד — ו<b>אפשר ללמוד ולהבין אותו במלואו בלי לפתוח חשבון בתשלום</b>.<br><br>'+
+    'חשבון API נחוץ רק אם תחליט בפועל לבנות מוצר משלך. גם אז מדובר בסכומים קטנים ללמידה, ותמיד עם תקרת הוצאה שמגנה עליך. אם זה לא מעניין אותך כרגע — קרא, הבן, והמשך הלאה בראש שקט.</div>' + l.html;
+})();
 add("m9","l2",{t:"פתיחת חשבון Console וקבלת מפתח API",
-req:`כתובת מייל · אמצעי תשלום (החיוב לפי שימוש בפועל)`,
+req:`כתובת מייל · אמצעי תשלום · <b>שלב זה אינו חובה</b> — אפשר ללמוד את המודול כולו בלי לפתוח חשבון`,
 steps:[
 `היכנס ל-<span class="kbd">platform.claude.com</span> והירשם. <b>שים לב:</b> זהו חשבון נפרד מ-claude.ai — מנוי Pro אינו כולל שימוש ב-API.`,
 `טען קרדיט ראשוני קטן (אפשר להתחיל בסכום מינימלי) תחת Billing.`,
@@ -5503,9 +5510,10 @@ function aboutPage(){
   '<li><b>מחשב (Chrome/Edge):</b> אייקון ההתקנה בשורת הכתובת</li></ul><div id="installwrap"></div></div>'+
   '<div class="card"><h2 style="margin-top:0">🔊 על המורה הקולי</h2><p class="sub">ההקראה מופקת על ידי מנוע הדיבור המובנה של המכשיר שלך — לא הקלטה של קריין אנושי. האיכות משתנה בין מכשירים: באנדרואיד ובאייפון היא בדרך כלל טובה, ב-Windows פחות. הכול קורה במכשיר, בלי אינטרנט.</p></div>'+
   '<div class="card"><h2 style="margin-top:0">📚 מקורות</h2><p class="sub">code.claude.com/docs · claude.com/docs · platform.claude.com/docs · support.claude.com · anthropic.com/engineering · academy.claude.com</p></div>'+
-  '<div class="card"><h2 style="margin-top:0">💬 שאל את קלוד מתוך האפליקציה</h2>'+
-  '<p class="sub">כפתור השיחה 💬 פותח מורה אישי שמכיר את הקורס ואת השיעור שאתה נמצא בו. הוא דורש <b>מפתח API אישי</b> (חשבון נפרד ממנוי Pro, בתשלום לפי שימוש) שנשמר רק במכשיר שלך.<br><br>'+
-  'לא רוצה מפתח? בכל דוגמת פרומפט בקורס יש כפתור <b>"פתח את זה בקלוד"</b> שמעביר אותך לשיחה עם הטקסט מוכן — בחינם, עם המנוי הרגיל.</p></div>'+
+  '<div class="card"><h2 style="margin-top:0">💬 שאל את קלוד</h2>'+
+  '<p class="sub"><b>כל הקורס עובד עם מנוי Claude רגיל — בלי תשלום נוסף.</b><br><br>'+
+  'כפתור השיחה 💬 פותח חלון שבו כותבים שאלה, והיא נפתחת בקלוד עם ההקשר של השיעור שאתה נמצא בו. גם לכל דוגמת פרומפט בקורס יש כפתור <b>"פתח את זה בקלוד"</b>. שניהם עובדים עם המנוי הרגיל שלך, בחינם.<br><br>'+
+  'קיימת גם אפשרות למתקדמים לקבל תשובות בתוך האפליקציה עצמה, אך היא דורשת מפתח API בתשלום נפרד — ואינה נחוצה לאף חלק בקורס.</p></div>'+
   '<div class="card"><h2 style="margin-top:0">📱 המכשיר שלך</h2>'+
   '<p class="sub">האפליקציה מזהה את המכשיר כדי להתאים את ההוראות. זה כל מה שדפדפן מאפשר לה לדעת — ואין לה שום גישה לקבצים, לאנשי קשר או לאפליקציות אחרות.</p>'+
   '<dl class="devinfo" id="devlist"></dl></div>'+
@@ -5621,7 +5629,38 @@ function openChat(){
   sh.onclick=e=>{if(e.target===sh)closeChat()};
   $("#chatclose").onclick=closeChat;
   $("#chatkey").onclick=()=>renderKeyForm(true);
-  if(getKey())renderChat(); else renderKeyForm(false);
+  if(getKey())renderChat(); else renderFree();
+}
+/* Free path (the default): compose a question here, open it in Claude with the
+   viewer's own subscription. No key, no cost, works for everyone. */
+function renderFree(){
+  const body=$("#chatbody"); if(!body)return;
+  $("#chatfoot").style.display="none";
+  const ctx=chatContext();
+  body.innerHTML='<div class="keyform">'+
+    '<div class="center" style="margin-bottom:14px"><div style="font-size:34px">✨</div>'+
+    '<p class="sub" style="margin-top:6px">כתוב את השאלה שלך, ואפתח לך אותה בקלוד — עם המנוי הרגיל שלך, בלי עלות נוספת.</p></div>'+
+    (ctx?'<div class="ht-req" style="margin-bottom:11px">📍 אצרף אוטומטית את ההקשר: '+esc(ctx)+'</div>':'')+
+    '<textarea id="freeq" rows="4" placeholder="מה תרצה לשאול?" style="width:100%;font-family:inherit;font-size:16px;'+
+      'background:var(--bg2);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--ink);resize:vertical"></textarea>'+
+    '<button class="btn wide mt" id="freego">✨ פתח את השאלה בקלוד</button>'+
+    '<div class="suggest">'+
+      ['הסבר לי את השיעור הזה במילים פשוטות','תן לי דוגמה מהחיים שלי','אני תקוע — מה לעשות?','בחן אותי על מה שלמדתי']
+        .map(s=>'<button>'+s+'</button>').join("")+'</div>'+
+    '<div class="center" style="margin-top:22px;padding-top:16px;border-top:1px solid var(--line)">'+
+      '<button class="btn ghost" id="toadv" style="font-size:13px;color:var(--ink3)">אפשרות למתקדמים: תשובות בתוך האפליקציה ›</button></div>'+
+  '</div>';
+  const go=()=>{
+    const q=$("#freeq").value.trim();
+    if(!q){toast("כתוב שאלה קודם");return}
+    const full=(ctx?"אני לומד בקורס \"קלוד מאסטר\" בעברית. "+ctx+"\n\n":"")+"השאלה שלי: "+q+
+      "\n\nענה בעברית פשוטה, והסבר כל מונח טכני. אני מתחיל בלי רקע טכני, עובד על Windows, ויש לי מנוי Claude Pro.";
+    window.open(CLAUDE_NEW+encodeURIComponent(full),"_blank","noopener");
+  };
+  $("#freego").onclick=go;
+  $("#freeq").onkeydown=e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey))go()};
+  body.querySelectorAll(".suggest button").forEach(b=>b.onclick=()=>{$("#freeq").value=b.textContent;go()});
+  $("#toadv").onclick=()=>renderKeyForm(false);
 }
 function closeChat(){CHAT.open=false;const s=$("#chatsheet");if(s)s.remove()}
 function renderKeyForm(fromSettings){
@@ -5629,9 +5668,10 @@ function renderKeyForm(fromSettings){
   $("#chatfoot").style.display="none";
   const has=!!getKey();
   body.innerHTML='<div class="keyform">'+
-    '<div class="box info"><b>ℹ️ איך השיחה כאן עובדת</b>האפליקציה הזו היא דף עצמאי, ולכן כדי לדבר עם קלוד מתוכה נדרש <b>מפתח API אישי</b> — חשבון נפרד ממנוי Pro, עם חיוב לפי שימוש בפועל.</div>'+
-    '<div class="box tip"><b>🔒 המפתח נשאר אצלך</b>הוא נשמר רק בדפדפן של המכשיר הזה, לא נשלח לשום מקום מלבד שרתי Anthropic, ואף אחד אחר — כולל מי ששיתף לך את האפליקציה — לא יכול לראות אותו.</div>'+
-    '<div class="box warn"><b>💡 לא רוצה מפתח? יש דרך חינמית</b>בכל דוגמת פרומפט בקורס יש כפתור <b>"פתח את זה בקלוד"</b> שמעביר אותך ישירות לשיחה עם קלוד עם הטקסט מוכן — בלי מפתח, בלי עלות, עם המנוי הרגיל שלך.</div>'+
+    '<div class="box warn"><b>⚠️ שים לב — זו אפשרות בתשלום</b>המסלול הזה דורש <b>מפתח API אישי</b>: חשבון נפרד לגמרי ממנוי Pro, עם חיוב לפי שימוש בפועל. <b>אינך חייב אותו</b> — כל הקורס עובד במלואו בלעדיו.</div>'+
+    '<div class="box tip"><b>✅ החלופה החינמית</b>המסך הקודם פותח את השאלה שלך ישירות בקלוד, עם המנוי הרגיל שלך ובלי עלות נוספת. ההבדל היחיד: התשובה מופיעה בקלוד ולא בתוך האפליקציה.'+
+      '<br><br><button class="btn sm sec" id="backfree">→ חזרה לאפשרות החינמית</button></div>'+
+    '<div class="box info"><b>🔒 אם בכל זאת — המפתח נשאר אצלך</b>הוא נשמר רק בדפדפן של המכשיר הזה, נשלח רק לשרתי Anthropic, ואף אחד אחר — כולל מי ששיתף לך את האפליקציה — לא יכול לראות אותו.</div>'+
     '<p class="sub" style="margin:14px 0 8px">להשגת מפתח: היכנס ל-<a href="https://platform.claude.com/settings/keys" target="_blank" rel="noopener" style="color:var(--brand)">platform.claude.com</a> ← Create Key. הדבק אותו כאן:</p>'+
     '<input id="keyinput" type="password" placeholder="sk-ant-..." autocomplete="off" value="">'+
     '<button class="btn wide" id="keysave">שמור והתחל לדבר</button>'+
@@ -5646,6 +5686,7 @@ function renderKeyForm(fromSettings){
   };
   const kc=$("#keyclear"); if(kc)kc.onclick=()=>{setKey("");CHAT.msgs=[];renderKeyForm(false);toast("המפתח נמחק")};
   const kb=$("#keyback"); if(kb)kb.onclick=renderChat;
+  const bf=$("#backfree"); if(bf)bf.onclick=renderFree;
 }
 function renderChat(){
   const body=$("#chatbody"); if(!body)return;
