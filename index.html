@@ -393,6 +393,7 @@ mark{background:var(--gold-soft);color:inherit;border-radius:3px;padding:0 2px}
   <button class="iconbtn" id="backbtn" style="display:none" aria-label="חזרה">→</button>
   <div class="title" id="bar-title">קלוד מאסטר</div>
   <div class="streak" id="bar-streak" style="display:none">🔥 0</div>
+  <span id="syncdot" title="סנכרון" style="font-size:14px"></span>
   <div class="pts" id="bar-pts">⭐ 0</div>
   <button class="iconbtn" id="searchbtn" aria-label="חיפוש">🔍</button>
   <button class="iconbtn" id="themebtn" aria-label="מצב תצוגה">◐</button>
@@ -5028,7 +5029,8 @@ S.seen=S.seen||{}; S.qstats=S.qstats||{}; S.pts=S.pts||0; S.theme=S.theme||"";
 S.ach=S.ach||{}; S.streak=S.streak||{n:0,last:""}; S.voice=S.voice||{rate:1};
 S.flags=S.flags||{};
 if(S.freeOnly===undefined)S.freeOnly=false;
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  if(typeof schedulePublish==="function")schedulePublish()}
 function addPts(n){S.pts+=n;save();paintBar()}
 function today(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
 function touchStreak(){
@@ -5283,6 +5285,7 @@ function route(){
   if(p[0]==="prog")return progPage();
   if(p[0]==="search")return searchPage();
   if(p[0]==="about")return aboutPage();
+  if(p[0]==="sync")return syncPage(p.slice(1).join("/"));
   home();
 }
 addEventListener("hashchange",route);
@@ -5613,10 +5616,55 @@ function progPage(){
       '<div class="progress-bar '+(p===100?"ok":"")+'" style="margin-top:6px"><i style="width:'+p+'%"></i></div></div>'+
       '<span class="chip '+(p===100?"done":"brand")+'">'+p+'%</span></a>';
   });
-  html+='</div><div class="center mt"><button class="btn ghost" style="color:var(--err)" id="resetall">🗑️ איפוס כל ההתקדמות</button></div></div>';
+  html+='</div><div class="sect-h">🔄 סנכרון בין מכשירים</div>'+
+    '<div class="card"><div id="syncbox"></div></div>'+
+    '<div class="center mt"><button class="btn ghost" style="color:var(--err)" id="resetall">🗑️ איפוס כל ההתקדמות</button></div></div>';
   app.innerHTML=html;
+  paintSyncBox();
   $("#resetall").onclick=()=>{if(confirm("לאפס את כל ההתקדמות? פעולה זו אינה הפיכה."))
     {localStorage.removeItem(KEY);location.reload()}};
+}
+function paintSyncBox(){
+  const box=$("#syncbox"); if(!box)return;
+  if(SYNC.mode==="artifact"){
+    box.innerHTML='<div class="costbar"><span class="ci">☁️</span><div><b>סנכרון אוטומטי פעיל.</b> '+
+      'ההתקדמות נשמרת בענן של קלוד ומגיעה לכל מכשיר שפותח את האפליקציה — בלי לעשות כלום.</div></div>'+
+      '<p class="sub">נשמר אוטומטית כמה שניות אחרי כל שינוי. הסמל ☁️ בסרגל העליון מראה את המצב.</p>';
+    return;
+  }
+  box.innerHTML='<p class="sub" style="margin-bottom:12px">ההתקדמות נשמרת במכשיר הזה. '+
+    'כדי להעביר אותה למכשיר אחר — צור קישור ושלח אותו לעצמך. הפתיחה במכשיר השני תמזג את הכול, בלי למחוק כלום.</p>'+
+    '<button class="btn wide" id="mksync">🔗 צור קישור סנכרון</button><div id="syncout"></div>';
+  $("#mksync").onclick=async()=>{
+    const url=syncLink();
+    const out=$("#syncout");
+    out.innerHTML='<div class="code" style="margin-top:12px;font-size:11.5px">'+esc(url)+'</div>'+
+      '<div class="px-bar"><button class="px-btn" id="sharesync">📤 שלח לעצמי</button>'+
+      '<button class="px-btn sec" id="copysync">העתק קישור</button></div>'+
+      '<p class="sub" style="margin-top:8px">פתח את הקישור במכשיר השני — וזהו.</p>';
+    $("#copysync").onclick=()=>navigator.clipboard.writeText(url)
+      .then(()=>toast("הקישור הועתק")).catch(()=>toast("ההעתקה נחסמה"));
+    $("#sharesync").onclick=()=>{
+      if(navigator.share)navigator.share({title:"ההתקדמות שלי בקלוד מאסטר",url:url}).catch(()=>{});
+      else navigator.clipboard.writeText(url).then(()=>toast("הקישור הועתק — שלח אותו לעצמך"));
+    };
+  };
+}
+
+/* ---------- SYNC SCREEN ---------- */
+function syncPage(code){
+  setBar("סנכרון",true);
+  if(!code){app.innerHTML='<div class="screen"><div class="card center">קוד חסר</div></div>';return}
+  const r=applySyncCode(code);
+  app.innerHTML='<div class="screen"><div class="card center">'+
+    (r.ok
+      ? '<div style="font-size:44px">✅</div><h1 style="font-size:21px">ההתקדמות מוזגה</h1>'+
+        '<p class="sub">'+(r.n?('נוספו '+r.n+' פריטים מהמכשיר השני.'):'הכול כבר היה מעודכן כאן.')+
+        '<br>שום דבר לא נמחק — מה שהושלם בכל אחד מהמכשירים נשמר.</p>'
+      : '<div style="font-size:44px">⚠️</div><h1 style="font-size:21px">לא הצלחתי למזג</h1>'+
+        '<p class="sub">'+esc(r.msg)+'</p>')+
+    '<a class="btn wide mt" href="#prog">להתקדמות שלי</a>'+
+    '<a class="btn sec wide mt" href="#home">למסך הבית</a></div></div>';
 }
 
 /* ---------- ABOUT ---------- */
@@ -5658,6 +5706,131 @@ function aboutPage(){
       const b=$("#doinstall");if(b)b.remove()};
   }
 }
+
+/* ================== SYNC ==================
+   Two paths, chosen automatically:
+   1. Artifact edition — the page publishes a small progress.json back to itself,
+      so every device that opens it picks the progress up. Verified against the
+      runtime: claude.use("artifact") exposes publish(), and the files form keeps
+      this view running while other views reload.
+   2. Anywhere else (the installable PWA) — a share link carries a compact code.
+   Both MERGE rather than overwrite: anything completed on either device counts. */
+const SYNC={mode:"local",api:null,timer:null,last:null,state:"",busy:false};
+
+function progressPayload(){
+  return {v:1,lessons:S.lessons,exDone:S.exDone,crit:S.crit,seen:S.seen,
+          pts:S.pts,streak:S.streak,qstats:S.qstats,ach:S.ach,at:Date.now()};
+}
+function mergeProgress(r){
+  if(!r||typeof r!=="object")return 0;
+  let n=0;
+  ["lessons","exDone","crit","seen","ach"].forEach(f=>{
+    Object.keys(r[f]||{}).forEach(k=>{if(!S[f][k]){S[f][k]=1;n++}});
+  });
+  if((r.pts||0)>S.pts){S.pts=r.pts;n++}
+  if(r.streak&&(r.streak.n||0)>(S.streak.n||0)){S.streak=r.streak;n++}
+  Object.keys(r.qstats||{}).forEach(k=>{
+    const mine=S.qstats[k]||{a:0,c:0}, theirs=r.qstats[k]||{a:0,c:0};
+    if(theirs.a>mine.a){S.qstats[k]=theirs;n++}
+  });
+  if(n){save();checkAch()}
+  return n;
+}
+function setSync(state){SYNC.state=state;const el=$("#syncdot");if(el)el.textContent=state}
+
+async function initSync(){
+  if(!window.claude||typeof window.claude.use!=="function")return;
+  let api=null;
+  try{api=await window.claude.use("artifact")}catch(e){}
+  if(!api||typeof api.publish!=="function")return;
+  SYNC.api=api; SYNC.mode="artifact"; setSync("☁️");
+  try{
+    const res=await fetch("progress.json?t="+Date.now(),{cache:"no-store"});
+    if(res.ok){
+      const n=mergeProgress(await res.json());
+      if(n){paintBar();route();toast("☁️ ההתקדמות סונכרנה מהמכשיר השני")}
+    }
+  }catch(e){/* first run: the file does not exist yet */}
+}
+function schedulePublish(){
+  if(SYNC.mode!=="artifact")return;
+  clearTimeout(SYNC.timer);
+  SYNC.timer=setTimeout(publishProgress,3000);   // batch rapid changes into one version
+}
+async function publishProgress(){
+  if(!SYNC.api||SYNC.busy)return;
+  const body=JSON.stringify(progressPayload());
+  if(body===SYNC.last)return;
+  SYNC.busy=true; setSync("⏳");
+  try{
+    await SYNC.api.publish({"progress.json":{content:body,contentType:"application/json"}});
+    SYNC.last=body; setSync("☁️");
+  }catch(e){
+    const c=e&&e.code;
+    if(c==="conflict"){setSync("☁️")}                       // another view won; it reloads everyone
+    else if(c==="not_writer"||c==="not_granted"||c==="capability_disabled"||c==="not_declared"){
+      SYNC.mode="local"; setSync("");                        // read-only view: stay local, silently
+    }
+    else if(c==="rate_limited"){setTimeout(publishProgress,15000)}
+    else setSync("⚠️");
+  }finally{SYNC.busy=false}
+}
+
+/* ---------- share-link sync (works on every surface) ---------- */
+function syncIndex(){
+  const L=[],X=[],Q=[];
+  MODS.forEach(m=>{
+    m.lessons.forEach(l=>L.push(lessonKey(m,l)));
+    m.exercises.forEach(x=>X.push(exKey(m,x)));
+    m.quiz.forEach(q=>Q.push(q.id));
+  });
+  return {L:L,X:X,Q:Q,sig:(L.length*7+X.length*13+Q.length*3).toString(36)};
+}
+function packBits(list,has){
+  const bytes=[];
+  for(let i=0;i<list.length;i+=8){
+    let b=0;
+    for(let j=0;j<8;j++) if(i+j<list.length&&has(list[i+j])) b|=1<<(7-j);
+    bytes.push(b);
+  }
+  let s=""; bytes.forEach(b=>s+=String.fromCharCode(b));
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function unpackBits(str,list,set){
+  let s=str.replace(/-/g,"+").replace(/_/g,"/");
+  while(s.length%4)s+="=";
+  let raw=""; try{raw=atob(s)}catch(e){return false}
+  for(let i=0;i<list.length;i++){
+    const byte=raw.charCodeAt(i>>3)||0;
+    if(byte&(1<<(7-(i&7)))) set(list[i]);
+  }
+  return true;
+}
+function makeSyncCode(){
+  const ix=syncIndex();
+  return [ix.sig, S.pts.toString(36), (S.streak.n||0).toString(36),
+    packBits(ix.L,k=>S.lessons[k]), packBits(ix.X,k=>S.exDone[k]), packBits(ix.Q,k=>S.seen[k])
+  ].join(".");
+}
+function applySyncCode(code){
+  const p=String(code||"").split(".");
+  if(p.length!==6)return{ok:false,msg:"הקוד אינו תקין"};
+  const ix=syncIndex();
+  if(p[0]!==ix.sig)return{ok:false,msg:"המכשירים מריצים גרסאות שונות של האפליקציה. רענן בשניהם ונסה שוב."};
+  let n=0;
+  unpackBits(p[3],ix.L,k=>{if(!S.lessons[k]){S.lessons[k]=1;n++}});
+  unpackBits(p[4],ix.X,k=>{if(!S.exDone[k]){S.exDone[k]=1;n++;
+    const m=MODS.find(mm=>k.startsWith(mm.id+"/"));
+    const x=m&&m.exercises.find(e=>k===exKey(m,e));
+    if(x)x.criteria.forEach((c,i)=>S.crit[k+":"+i]=1);}});
+  unpackBits(p[5],ix.Q,k=>{if(!S.seen[k]){S.seen[k]=1;n++}});
+  const pts=parseInt(p[1],36)||0, st=parseInt(p[2],36)||0;
+  if(pts>S.pts){S.pts=pts;n++}
+  if(st>(S.streak.n||0)){S.streak.n=st;n++}
+  save();checkAch();paintBar();
+  return{ok:true,n:n};
+}
+function syncLink(){return location.origin+location.pathname+"#sync/"+makeSyncCode()}
 
 /* ================== DEVICE ================== */
 const DEV=(function(){
@@ -5904,6 +6077,7 @@ if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostnam
 }
 paintBar();
 route();
+initSync();
 })();
 </script>
 </body>
