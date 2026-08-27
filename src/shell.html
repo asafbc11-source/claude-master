@@ -109,6 +109,21 @@ h2{font-size:19px;margin:8px 0}
 .chip.brand{background:var(--brand-soft);color:var(--brand)}
 .chip.gold{background:var(--gold-soft);color:var(--gold)}
 .chip.lvl{background:var(--bg3);color:var(--ink2)}
+.chip.pay{background:var(--warn-soft);color:var(--warn)}
+.costbar{display:flex;align-items:center;gap:10px;background:var(--ok-soft);border-radius:var(--rs);
+  padding:11px 14px;margin-bottom:14px;font-size:14px;line-height:1.5}
+.costbar.pay{background:var(--warn-soft)}
+.costbar .ci{font-size:20px;flex:none}
+.filterrow{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:var(--rs);padding:11px 14px;margin-bottom:14px;cursor:pointer;font-size:14.5px}
+.filterrow .fdesc{flex:1;min-width:0}
+.filterrow .fdesc b{display:block;font-size:14.5px}
+.filterrow .fdesc span{font-size:12.5px;color:var(--ink2)}
+.switch{width:46px;height:27px;border-radius:99px;background:var(--bg4);flex:none;position:relative;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;right:3px;width:21px;height:21px;border-radius:50%;
+  background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.switch.on{background:var(--ok)}
+.switch.on::after{transform:translateX(-19px)}
 .progress-bar{height:7px;border-radius:99px;background:var(--bg3);overflow:hidden}
 .progress-bar>i{display:block;height:100%;border-radius:99px;background:var(--brand);transition:width .6s cubic-bezier(.2,.8,.3,1)}
 .progress-bar.ok>i{background:var(--ok)}
@@ -414,6 +429,7 @@ S.lessons=S.lessons||{}; S.crit=S.crit||{}; S.exDone=S.exDone||{};
 S.seen=S.seen||{}; S.qstats=S.qstats||{}; S.pts=S.pts||0; S.theme=S.theme||"";
 S.ach=S.ach||{}; S.streak=S.streak||{n:0,last:""}; S.voice=S.voice||{rate:1};
 S.flags=S.flags||{};
+if(S.freeOnly===undefined)S.freeOnly=false;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function addPts(n){S.pts+=n;save();paintBar()}
 function today(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
@@ -438,6 +454,9 @@ function toast(msg,gold){const t=document.createElement("div");t.className="toas
   document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function modById(id){return MODS.find(m=>m.id===id)}
+function isPaid(x){return x&&x.cost==="extra"}
+function visibleMods(){return S.freeOnly?MODS.filter(m=>!isPaid(m)):MODS}
+function costChip(x){return isPaid(x)?'<span class="chip pay">💳 תשלום נפרד</span>':'<span class="chip ph">✅ כלול במנוי</span>'}
 function lessonKey(m,l){return m.id+"/"+l.id}
 function exKey(m,x){return m.id+"/"+x.id}
 function modLessonsDone(m){return m.lessons.filter(l=>S.lessons[lessonKey(m,l)]).length}
@@ -672,7 +691,7 @@ addEventListener("hashchange",route);
 
 /* ---------- HOME ---------- */
 function nextLesson(){
-  for(const m of MODS)for(const l of m.lessons)if(!S.lessons[lessonKey(m,l)])return{m,l};
+  for(const m of visibleMods())for(const l of m.lessons)if(!S.lessons[lessonKey(m,l)])return{m,l};
   return null;
 }
 function home(){
@@ -683,18 +702,24 @@ function home(){
     (nx?'<a class="btn mt wide" style="background:#fff;color:var(--brand2)" href="#l/'+nx.m.id+'/'+nx.l.id+'">▶ המשך: '+esc(nx.l.title)+'</a>'
        :(MODS.length?'<div class="chip mt" style="background:#fff;color:var(--ok)">🎓 סיימת את כל השיעורים!</div>':""))+
     '</div>';
+  html+='<div class="filterrow" id="freetoggle"><div class="fdesc"><b>רק מה שכלול במנוי</b>'+
+    '<span>מסתיר את המודול היחיד שדורש תשלום נפרד</span></div>'+
+    '<div class="switch'+(S.freeOnly?" on":"")+'"></div></div>';
   let lastLevel="";
-  MODS.forEach((m,i)=>{
+  visibleMods().forEach((m,i)=>{
     if(m.level&&m.level!==lastLevel){lastLevel=m.level;html+='<div class="sect-h">'+esc(m.level)+'</div>'}
     const p=modPct(m);
     html+='<div class="card modcard" onclick="location.hash=\'m/'+m.id+'\'">'+
       '<div class="mi" style="background:'+(p===100?"var(--ok-soft)":"var(--bg3)")+'">'+m.icon+'</div>'+
-      '<div class="mtx"><b>'+(i+1)+'. '+esc(m.title)+'</b><div class="sub">'+esc(m.subtitle)+'</div>'+
+      '<div class="mtx"><b>'+(MODS.indexOf(m)+1)+'. '+esc(m.title)+'</b><div class="sub">'+esc(m.subtitle)+'</div>'+
+      (isPaid(m)?'<div style="margin:4px 0 6px">'+costChip(m)+'</div>':'')+
       '<div class="progress-bar '+(p===100?"ok":"")+'"><i style="width:'+p+'%"></i></div></div>'+
       '<div class="arr">›</div></div>';
   });
   html+='<div class="center mt"><a class="btn ghost" href="#about">אודות · התקנה בטלפון · מקורות</a></div></div>';
   app.innerHTML=html;
+  $("#freetoggle").onclick=()=>{S.freeOnly=!S.freeOnly;save();home();
+    toast(S.freeOnly?"מוצג רק מה שכלול במנוי":"מוצגים כל המודולים")};
 }
 
 /* ---------- MODULE ---------- */
@@ -707,7 +732,9 @@ function modulePage(mid,tab){
   let html='<div class="screen"><div class="card"><div style="display:flex;gap:14px;align-items:center">'+
     '<div style="width:56px;height:56px;border-radius:17px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:30px;flex:none">'+m.icon+'</div>'+
     '<div><h1 style="font-size:20px">'+esc(m.title)+'</h1><div class="sub">'+esc(m.subtitle)+'</div>'+
-    (m.level?'<span class="chip lvl" style="margin-top:6px">'+esc(m.level)+'</span>':"")+'</div></div></div>'+
+    '<div style="margin-top:6px">'+costChip(m)+(m.level?' <span class="chip lvl">'+esc(m.level)+'</span>':"")+'</div></div></div>'+
+  (isPaid(m)?'<div class="costbar pay"><span class="ci">💳</span><div><b>המודול היחיד שדורש תשלום נפרד.</b> '+
+    'אפשר ללמוד ולהבין אותו במלואו בחינם — חשבון בתשלום נדרש רק אם תבחר לבנות מוצר בפועל.</div></div>':"")+
   '<div class="tabs">'+
     '<button class="'+(tab==="lessons"?"on":"")+'" onclick="location.hash=\'m/'+mid+'/lessons\'">📚 שיעורים</button>'+
     '<button class="'+(tab==="ex"?"on":"")+'" onclick="location.hash=\'m/'+mid+'/ex\'">🛠️ תרגילים</button>'+
@@ -764,7 +791,8 @@ function lessonPage(mid,lid){
   const prev=m.lessons[li-1],next=m.lessons[li+1];
   const body=l.html.replace(/\[\[demo:(\d+)\]\]/g,'<div class="demo-slot" data-i="$1"></div>');
   app.innerHTML='<div class="screen">'+
-    '<div class="sub" style="margin-bottom:8px">'+m.icon+' שיעור '+(li+1)+' מתוך '+m.lessons.length+'</div>'+
+    '<div class="sub" style="margin-bottom:8px">'+m.icon+' שיעור '+(li+1)+' מתוך '+m.lessons.length+
+      (isPaid(l)?' · <span class="chip pay">💳 ביצוע דורש תשלום</span>':'')+'</div>'+
     '<h1 style="margin-bottom:14px">'+esc(l.title)+'</h1>'+
     '<button class="voice-cta" id="voicego"><span class="vi">🔊</span><div><b>הַקְרֵא לי את השיעור</b>'+
       '<span>המורה הקולי יקריא בעברית — אפשר להאזין תוך כדי הליכה</span></div></button>'+

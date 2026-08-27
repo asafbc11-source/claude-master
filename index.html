@@ -109,6 +109,21 @@ h2{font-size:19px;margin:8px 0}
 .chip.brand{background:var(--brand-soft);color:var(--brand)}
 .chip.gold{background:var(--gold-soft);color:var(--gold)}
 .chip.lvl{background:var(--bg3);color:var(--ink2)}
+.chip.pay{background:var(--warn-soft);color:var(--warn)}
+.costbar{display:flex;align-items:center;gap:10px;background:var(--ok-soft);border-radius:var(--rs);
+  padding:11px 14px;margin-bottom:14px;font-size:14px;line-height:1.5}
+.costbar.pay{background:var(--warn-soft)}
+.costbar .ci{font-size:20px;flex:none}
+.filterrow{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:var(--rs);padding:11px 14px;margin-bottom:14px;cursor:pointer;font-size:14.5px}
+.filterrow .fdesc{flex:1;min-width:0}
+.filterrow .fdesc b{display:block;font-size:14.5px}
+.filterrow .fdesc span{font-size:12.5px;color:var(--ink2)}
+.switch{width:46px;height:27px;border-radius:99px;background:var(--bg4);flex:none;position:relative;transition:background .2s}
+.switch::after{content:"";position:absolute;top:3px;right:3px;width:21px;height:21px;border-radius:50%;
+  background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.switch.on{background:var(--ok)}
+.switch.on::after{transform:translateX(-19px)}
 .progress-bar{height:7px;border-radius:99px;background:var(--bg3);overflow:hidden}
 .progress-bar>i{display:block;height:100%;border-radius:99px;background:var(--brand);transition:width .6s cubic-bezier(.2,.8,.3,1)}
 .progress-bar.ok>i{background:var(--ok)}
@@ -4807,6 +4822,101 @@ check:`פתיחת הכתובת בדפדפן מציגה את האתר שלך, ו�
 fix:`מופיע דף 404? האתר עדיין נבנה — המתן דקה ורענן. לא נבנה כלל? בקש מקלוד לוודא שהקובץ הראשי נקרא <span class="kbd">index.html</span> ונמצא בשורש התיקייה.`});
 })();
 
+/* ---- pricing.js ---- */
+/* Cost-awareness layer: marks what the Pro subscription already covers, and adds
+   two foundation lessons about plans, limits and getting the most out of the subscription.
+   The course focuses on what costs nothing beyond the subscription. */
+(function(){
+const by = id => window.COURSE_MODULES.find(m => m.id === id);
+
+/* Only the API module needs a separate paid account. Everything else is covered by a Claude subscription. */
+by("m9").cost = "extra";
+by("m9").subtitle = "לבנות מוצרים על קלוד — מודול העשרה שדורש חשבון נפרד בתשלום";
+
+/* Lessons that touch a paid account get their own marker. */
+[["m9","l2"],["m9","l4"],["m9","l5"],["m14","l7"]].forEach(function(p){
+  const m = by(p[0]), l = m && m.lessons.find(x => x.id === p[1]);
+  if(l) l.cost = "extra";
+});
+
+/* ---------- two new foundation lessons in module 1 ---------- */
+by("m1").lessons.push({
+id:"l5", title:"מה כלול במנוי שלך — ומה עולה כסף", minutes:7, cost:"pro", html:`
+<h2>השאלה שחוסכת בלבול ואגורות</h2>
+<p>לפני שנצלול לכלים, בוא נסגור פינה שמבלבלת כמעט כל מתחיל: <b>מה בדיוק אתה מקבל עם המנוי, ומה דורש תשלום נפרד.</b></p>
+<div class="box tip"><b>✅ הבשורה הטובה</b>כמעט <b>כל</b> מה שתלמד בקורס הזה כלול במנוי שלך. אין תשלום נוסף, אין הפתעות, אין כרטיס אשראי נוסף.</div>
+<h2>מה כלול במנוי Claude</h2>
+<div class="tbl-wrap"><table class="cmp">
+<tr><th>הכלי</th><th>מה מקבלים</th></tr>
+<tr><td><b>Claude.ai</b></td><td>שיחות, Projects, Artifacts, Styles, זיכרון, חיפוש ברשת, העלאת קבצים</td></tr>
+<tr><td><b>Claude Code</b></td><td>הכול: טרמינל, דסקטופ, עורך, סוכנים, אוטומציה, סשנים בענן</td></tr>
+<tr><td><b>Cowork</b></td><td>העמית הדיגיטלי שעובד על הקבצים שלך</td></tr>
+<tr><td><b>Skills, MCP, חיבורים, תוספים</b></td><td>כל ההרחבות, בלי עלות נוספת</td></tr>
+<tr><td><b>אפליקציות</b></td><td>מחשב, אתר, אנדרואיד ואייפון — אותו חשבון בכל מקום</td></tr>
+</table></div>
+<p>וזה החלק החשוב: <b>מנוי אחד מכסה את כולם</b>. אתה לא משלם בנפרד על הצ'אט, על Claude Code ועל Cowork — הם חולקים את אותו חשבון ואת אותה מכסה.</p>
+<h2>ומה כן עולה כסף בנפרד?</h2>
+<p>דבר אחד בלבד: <span class="term">ה-API <span class="en">(Application Programming Interface)</span></span> — הדרך שבה מפתחים בונים מוצרים משלהם על קלוד.</p>
+<div class="tbl-wrap"><table class="cmp">
+<tr><th></th><th>המנוי שלך</th><th>ה-API</th></tr>
+<tr><td>נרשמים ב…</td><td>claude.ai</td><td>platform.claude.com — <b>חשבון נפרד לגמרי</b></td></tr>
+<tr><td>למי זה</td><td>למשתמש — לך</td><td>למפתח שבונה מוצר לאחרים</td></tr>
+<tr><td>תשלום</td><td>קבוע, כבר שילמת</td><td>לפי שימוש, כרטיס אשראי נפרד</td></tr>
+<tr><td>נדרש בקורס?</td><td>כן — לכל דבר</td><td><b>לא.</b> רק מודול 9, שהוא העשרה</td></tr>
+</table></div>
+<div class="box info"><b>ℹ️ אנלוגיה שמסדרת את זה</b>המנוי הוא כמו רישיון נהיגה — אתה נוהג ברכב שלך לכל מקום. ה-API הוא כמו רישיון להפעיל חברת הסעות: אותו כביש, מטרה אחרת לגמרי, ורישוי נפרד.</div>
+<h2>איך זה מסומן באפליקציה</h2>
+<p>כדי שלא תצטרך לנחש, סימנתי הכול:</p>
+<ul>
+<li><span class="chip ph">✅ כלול במנוי</span> — אפשר לבצע הכול כאן ועכשיו</li>
+<li><span class="chip pay">💳 דורש תשלום נפרד</span> — לימוד והבנה בחינם, ביצוע דורש חשבון API</li>
+</ul>
+<p>ובמסך הבית יש מתג שמסתיר לגמרי את מה שעולה כסף, אם אתה מעדיף להתרכז רק בחינמי.</p>
+<div class="box pro"><b>🎓 ההמלצה שלי</b>למד את כל הקורס עם המנוי שלך. מודול 9 שווה קריאה כדי <b>להבין</b> איך מוצרים נבנים — אבל אל תפתח חשבון בתשלום אלא אם תחליט בעצמך, בשלב מאוחר, שאתה רוצה לבנות מוצר לאחרים.</div>
+<div class="box try"><b>🚀 נסה עכשיו</b>חזור למסך הבית וחפש את המתג "רק מה שכלול במנוי". הפעל אותו וראה איך הקורס מצטמצם למה שזמין לך בלי אגורה נוספת.</div>
+`},
+{id:"l6", title:"לנצל את המנוי עד הסוף", minutes:7, cost:"pro", html:`
+<h2>המשאב האמיתי שלך: מכסת שימוש</h2>
+<p>המנוי אינו "בלתי מוגבל", אבל הוא גם לא נגמר מהר. חשוב להבין איך הוא עובד — כי הידיעה הזו שווה כסף, וחוסכת תסכול.</p>
+<h2>שתי מכסות שפועלות במקביל</h2>
+<div class="tbl-wrap"><table class="cmp">
+<tr><th>מכסה</th><th>איך היא עובדת</th></tr>
+<tr><td><b>חלון של חמש שעות</b></td><td>מתאפס כל חמש שעות מרגע ההודעה הראשונה שלך בחלון</td></tr>
+<tr><td><b>מכסה שבועית</b></td><td>מתאפסת במועד קבוע שמשויך לחשבון שלך</td></tr>
+</table></div>
+<div class="box warn"><b>⚠️ העובדה שהכי חשוב לדעת</b>הצ'אט, Claude Code ו-Cowork <b>חולקים את אותה מכסה</b>. סשן ארוך ומבוזבז ב-Claude Code בבוקר יקצר לך את הצ'אט בערב. זו בדיוק הסיבה שניהול ההקשר שנלמד בהמשך הוא לא רק עניין של איכות — הוא גם חיסכון ישיר.</div>
+<h2>שבעה הרגלים שמותחים את המכסה</h2>
+<ol>
+<li><b>הרץ <span class="kbd">/clear</span> בין משימות.</b> כל תור שולח מחדש את כל ההקשר — הקשר מנופח = יותר צריכה, בלי שום תועלת.</li>
+<li><b>העבר חקירות לסוכן משנה.</b> הוא עובד בחלון נפרד ומחזיר סיכום קצר במקום להעמיס עליך.</li>
+<li><b>השתמש ב-<span class="kbd">!</span> לפקודות.</b> פקודה שמורצת ישירות <b>לא צורכת מכסה בכלל</b> — רק התגובה של קלוד עליה.</li>
+<li><b>בקש תשובות קצרות כשזה מספיק.</b> "תענה בקצרה" הוא חיסכון אמיתי.</li>
+<li><b>התאם את עומק החשיבה למשימה.</b> לא כל שאלה צריכה חשיבה עמוקה — <span class="kbd">/effort</span> שולט בזה.</li>
+<li><b>תכנן לפני שמבצעים.</b> תוכנית טובה חוסכת שלושה ניסיונות כושלים — וזה החיסכון הגדול מכולם.</li>
+<li><b>עקוב.</b> <span class="kbd">/usage</span> מראה מה מנצל את המכסה, ו-<span class="kbd">/context</span> מראה מה תופס מקום עכשיו.</li>
+</ol>
+<h2>נגמרה המכסה — מה עושים?</h2>
+<ul>
+<li><b>ממתינים לאיפוס.</b> חלון חמש השעות חוזר מהר יותר משנדמה.</li>
+<li><b>עוברים למודל קל יותר</b> למשימות פשוטות — הוא צורך פחות.</li>
+<li><b>מנצלים את הזמן</b> לקריאת שיעורים באפליקציה או לתכנון המשימה הבאה על נייר.</li>
+<li>הרץ <span class="kbd">/rate-limit-options</span> בסשן כדי לראות מה זמין לך.</li>
+</ul>
+<div class="box pro"><b>🎓 שינוי התפיסה</b>מכסה אינה מגבלה מעצבנת אלא <b>משוב</b>. משתמש שמנהל את ההקשר, מתכנן לפני שהוא מבצע ומאציל נכון — כמעט לא מרגיש אותה. משתמש שמנהל שיחה אחת אינסופית מגיע אליה כל יום. אותו מנוי, שתי חוויות.</div>
+<div class="box try"><b>🚀 נסה עכשיו (דורש מחשב)</b>בסשן Claude Code הרץ <span class="kbd">/usage</span> וראה מה מנצל את המכסה שלך. אחר כך <span class="kbd">/context</span> — ושים לב כמה מהחלון תפוס במשהו שכבר לא רלוונטי.</div>
+`});
+
+by("m1").quiz.push(
+{id:"m1q19",q:"מה כלול במנוי Claude שלך?",opts:["הצ'אט, Projects, Artifacts, Claude Code, Cowork, Skills, MCP וחיבורים — הכול במנוי אחד","רק הצ'אט באתר","הצ'אט וגם גישת API","רק שני כלים לבחירה"],a:0,exp:"מנוי אחד מכסה את כל הכלים, והם חולקים את אותו חשבון ואותה מכסה."},
+{id:"m1q20",q:"מה הדבר היחיד בקורס שדורש תשלום נפרד?",opts:["ה-API — חשבון נפרד ב-platform.claude.com לבניית מוצרים","Claude Code","Cowork","אפליקציית המובייל"],a:0,exp:"וגם אותו אפשר ללמוד ולהבין במלואו בלי לפתוח חשבון בתשלום."},
+{id:"m1q21",q:"האם מנוי Pro כולל גישת API?",opts:["לא — אלה שני מוצרים נפרדים עם חשבונות וחיובים נפרדים","כן, בהיקף מוגבל","כן, ללא הגבלה","רק במנוי שנתי"],a:0,exp:"claude.ai הוא למשתמש; platform.claude.com הוא למפתח. שני עולמות."},
+{id:"m1q22",q:"איך פועלות מכסות השימוש במנוי?",opts:["שתי מכסות במקביל: חלון שמתאפס כל חמש שעות, ומכסה שבועית","מכסה יומית אחת","מכסה חודשית אחת","אין מכסות במנוי בתשלום"],a:0,exp:"שתיהן פועלות יחד, וכדאי להכיר את שתיהן."},
+{id:"m1q23",q:"האם הצ'אט, Claude Code ו-Cowork חולקים מכסה?",opts:["כן — כולם מושכים מאותה מכסה","לא, לכל אחד מכסה נפרדת","רק הצ'אט ו-Cowork","תלוי במנוי"],a:0,exp:"לכן סשן מבוזבז ב-Claude Code בבוקר מקצר לך את הצ'אט בערב."},
+{id:"m1q24",q:"איזה הרגל חוסך הכי הרבה מכסה?",opts:["/clear בין משימות — כל תור שולח מחדש את כל ההקשר","לכתוב פרומפטים קצרים","להשתמש רק בבוקר","לסגור את המחשב בין שימושים"],a:0,exp:"הקשר מנופח נשלח מחדש בכל תור — זה בזבוז ישיר בלי שום תועלת."},
+{id:"m1q25",q:"מה מיוחד בהרצת פקודה עם התו !?",opts:["היא רצה ישירות ולא צורכת מכסה — רק התגובה של קלוד עליה כן","היא מהירה יותר","היא עוקפת הרשאות","היא נשמרת בהיסטוריה"],a:0,exp:"דרך פשוטה לחסוך: פקודות שאתה יודע להריץ בעצמך לא צריכות לעבור דרך המודל."}
+);
+})();
+
 /* ---- glossary.js ---- */
 window.GLOSSARY=[
 {he:"בינה מלאכותית",en:"AI",def:"תוכנות שמבצעות משימות שדרשו בעבר חשיבה אנושית: הבנת שפה, כתיבה, ניתוח ותכנות."},
@@ -4917,6 +5027,7 @@ S.lessons=S.lessons||{}; S.crit=S.crit||{}; S.exDone=S.exDone||{};
 S.seen=S.seen||{}; S.qstats=S.qstats||{}; S.pts=S.pts||0; S.theme=S.theme||"";
 S.ach=S.ach||{}; S.streak=S.streak||{n:0,last:""}; S.voice=S.voice||{rate:1};
 S.flags=S.flags||{};
+if(S.freeOnly===undefined)S.freeOnly=false;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function addPts(n){S.pts+=n;save();paintBar()}
 function today(){const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()}
@@ -4941,6 +5052,9 @@ function toast(msg,gold){const t=document.createElement("div");t.className="toas
   document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function modById(id){return MODS.find(m=>m.id===id)}
+function isPaid(x){return x&&x.cost==="extra"}
+function visibleMods(){return S.freeOnly?MODS.filter(m=>!isPaid(m)):MODS}
+function costChip(x){return isPaid(x)?'<span class="chip pay">💳 תשלום נפרד</span>':'<span class="chip ph">✅ כלול במנוי</span>'}
 function lessonKey(m,l){return m.id+"/"+l.id}
 function exKey(m,x){return m.id+"/"+x.id}
 function modLessonsDone(m){return m.lessons.filter(l=>S.lessons[lessonKey(m,l)]).length}
@@ -5175,7 +5289,7 @@ addEventListener("hashchange",route);
 
 /* ---------- HOME ---------- */
 function nextLesson(){
-  for(const m of MODS)for(const l of m.lessons)if(!S.lessons[lessonKey(m,l)])return{m,l};
+  for(const m of visibleMods())for(const l of m.lessons)if(!S.lessons[lessonKey(m,l)])return{m,l};
   return null;
 }
 function home(){
@@ -5186,18 +5300,24 @@ function home(){
     (nx?'<a class="btn mt wide" style="background:#fff;color:var(--brand2)" href="#l/'+nx.m.id+'/'+nx.l.id+'">▶ המשך: '+esc(nx.l.title)+'</a>'
        :(MODS.length?'<div class="chip mt" style="background:#fff;color:var(--ok)">🎓 סיימת את כל השיעורים!</div>':""))+
     '</div>';
+  html+='<div class="filterrow" id="freetoggle"><div class="fdesc"><b>רק מה שכלול במנוי</b>'+
+    '<span>מסתיר את המודול היחיד שדורש תשלום נפרד</span></div>'+
+    '<div class="switch'+(S.freeOnly?" on":"")+'"></div></div>';
   let lastLevel="";
-  MODS.forEach((m,i)=>{
+  visibleMods().forEach((m,i)=>{
     if(m.level&&m.level!==lastLevel){lastLevel=m.level;html+='<div class="sect-h">'+esc(m.level)+'</div>'}
     const p=modPct(m);
     html+='<div class="card modcard" onclick="location.hash=\'m/'+m.id+'\'">'+
       '<div class="mi" style="background:'+(p===100?"var(--ok-soft)":"var(--bg3)")+'">'+m.icon+'</div>'+
-      '<div class="mtx"><b>'+(i+1)+'. '+esc(m.title)+'</b><div class="sub">'+esc(m.subtitle)+'</div>'+
+      '<div class="mtx"><b>'+(MODS.indexOf(m)+1)+'. '+esc(m.title)+'</b><div class="sub">'+esc(m.subtitle)+'</div>'+
+      (isPaid(m)?'<div style="margin:4px 0 6px">'+costChip(m)+'</div>':'')+
       '<div class="progress-bar '+(p===100?"ok":"")+'"><i style="width:'+p+'%"></i></div></div>'+
       '<div class="arr">›</div></div>';
   });
   html+='<div class="center mt"><a class="btn ghost" href="#about">אודות · התקנה בטלפון · מקורות</a></div></div>';
   app.innerHTML=html;
+  $("#freetoggle").onclick=()=>{S.freeOnly=!S.freeOnly;save();home();
+    toast(S.freeOnly?"מוצג רק מה שכלול במנוי":"מוצגים כל המודולים")};
 }
 
 /* ---------- MODULE ---------- */
@@ -5210,7 +5330,9 @@ function modulePage(mid,tab){
   let html='<div class="screen"><div class="card"><div style="display:flex;gap:14px;align-items:center">'+
     '<div style="width:56px;height:56px;border-radius:17px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:30px;flex:none">'+m.icon+'</div>'+
     '<div><h1 style="font-size:20px">'+esc(m.title)+'</h1><div class="sub">'+esc(m.subtitle)+'</div>'+
-    (m.level?'<span class="chip lvl" style="margin-top:6px">'+esc(m.level)+'</span>':"")+'</div></div></div>'+
+    '<div style="margin-top:6px">'+costChip(m)+(m.level?' <span class="chip lvl">'+esc(m.level)+'</span>':"")+'</div></div></div>'+
+  (isPaid(m)?'<div class="costbar pay"><span class="ci">💳</span><div><b>המודול היחיד שדורש תשלום נפרד.</b> '+
+    'אפשר ללמוד ולהבין אותו במלואו בחינם — חשבון בתשלום נדרש רק אם תבחר לבנות מוצר בפועל.</div></div>':"")+
   '<div class="tabs">'+
     '<button class="'+(tab==="lessons"?"on":"")+'" onclick="location.hash=\'m/'+mid+'/lessons\'">📚 שיעורים</button>'+
     '<button class="'+(tab==="ex"?"on":"")+'" onclick="location.hash=\'m/'+mid+'/ex\'">🛠️ תרגילים</button>'+
@@ -5267,7 +5389,8 @@ function lessonPage(mid,lid){
   const prev=m.lessons[li-1],next=m.lessons[li+1];
   const body=l.html.replace(/\[\[demo:(\d+)\]\]/g,'<div class="demo-slot" data-i="$1"></div>');
   app.innerHTML='<div class="screen">'+
-    '<div class="sub" style="margin-bottom:8px">'+m.icon+' שיעור '+(li+1)+' מתוך '+m.lessons.length+'</div>'+
+    '<div class="sub" style="margin-bottom:8px">'+m.icon+' שיעור '+(li+1)+' מתוך '+m.lessons.length+
+      (isPaid(l)?' · <span class="chip pay">💳 ביצוע דורש תשלום</span>':'')+'</div>'+
     '<h1 style="margin-bottom:14px">'+esc(l.title)+'</h1>'+
     '<button class="voice-cta" id="voicego"><span class="vi">🔊</span><div><b>הַקְרֵא לי את השיעור</b>'+
       '<span>המורה הקולי יקריא בעברית — אפשר להאזין תוך כדי הליכה</span></div></button>'+

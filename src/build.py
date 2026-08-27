@@ -7,7 +7,7 @@ ROOT = os.path.dirname(HERE)
 CONTENT_DIR = os.path.join(HERE, "content")
 ORDER = ["m01.js","m02.js","m03.js","m04.js","m05.js","m06.js","m07.js","m08.js","m09.js","m10.js",
          "m11.js","m12.js","m13.js","m14.js","m15.js","m16.js","m17.js",
-         "deepening.js","howto.js","glossary.js"]
+         "deepening.js","howto.js","pricing.js","glossary.js"]
 MARKER = "/*==CONTENT==*/"
 
 def read(p):
