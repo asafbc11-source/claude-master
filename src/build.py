@@ -15,6 +15,9 @@ def read(p):
         return f.read()
 
 shell = read(os.path.join(HERE, "shell.html"))
+TUTOR_MARKER = "/*==TUTOR==*/"
+if TUTOR_MARKER in shell:
+    shell = shell.replace(TUTOR_MARKER, read(os.path.join(HERE, "tutor.js")), 1)
 if MARKER not in shell:
     sys.exit("marker not found in shell.html")
 

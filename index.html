@@ -229,6 +229,24 @@ body.has-voice .fab{bottom:calc(150px + env(safe-area-inset-bottom))}
   animation:bounce 1.2s infinite}
 .typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
 @keyframes bounce{0%,60%,100%{transform:none;opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+.tut-lead{font-size:14px;color:var(--ink2);margin-bottom:9px}
+.tut-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--rs);padding:13px 15px;font-size:15.5px;line-height:1.65}
+.tut-card .box{margin:0}
+.tut-card .howto{margin:0;border:none}
+.tut-card p{margin:0 0 9px}
+.tut-card p:last-of-type{margin-bottom:0}
+.tut-src{margin-top:11px;padding-top:9px;border-top:1px solid var(--line);font-size:13px}
+.tut-link{color:var(--brand);text-decoration:none;font-weight:700}
+.tut-more{margin-top:13px}
+.tut-more>b{font-size:13px;color:var(--ink2);display:block;margin-bottom:6px}
+.tut-rel{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 11px;margin-bottom:6px;font-size:13px}
+.tut-rel span{display:block;color:var(--ink3);margin-top:2px;line-height:1.45}
+.tut-q{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:9px;font-size:15px}
+.tut-ans{color:var(--ok);font-weight:700;margin-top:6px}
+.tut-exp{color:var(--ink2);font-size:13.5px;margin-top:5px;line-height:1.55}
+.tut-foot{font-size:13px;color:var(--ink3);margin-top:8px}
+.tut-miss{background:var(--warn-soft);border-radius:var(--rs);padding:12px 14px;font-size:15px;line-height:1.6}
+.cmsg.tut{max-width:100%;background:none;border:none;padding:0}
 .keyform{max-width:460px;margin:0 auto}
 .keyform input{width:100%;font-family:Consolas,monospace;font-size:14px;direction:ltr;text-align:left;
   background:var(--bg2);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;color:var(--ink);margin-bottom:10px}
@@ -4492,6 +4510,19 @@ check:`פתח שיחה חדשה ושאל "מה אתה זוכר עליי?" — א
 fix:`הזיכרון כבוי? בדוק ב-Settings ← Memory שהאפשרות מופעלת. שים לב שבשיחת אינקוגניטו הוא לא פועל בכוונה.`});
 
 /* ============ מודול 4 — Claude Code ============ */
+add("m4","l3",{t:"התקנת Claude Code על Windows",
+req:`מנוי Claude (Pro ומעלה) · Windows · הרשאת התקנה במחשב`,
+steps:[
+`פתח <b>PowerShell</b>: לחץ <span class="kbd">Win + X</span> ובחר "Terminal" או "Windows PowerShell". ודא שבתחילת השורה כתוב <span class="kbd">PS C:\\</span> — אם אין שם <span class="kbd">PS</span>, אתה ב-CMD והפקודה לא תעבוד.`,
+`העתק והדבק את הפקודה הזו, ולחץ Enter:<div class="code">irm https://claude.ai/install.ps1 | iex</div>`,
+`המתן להורדה ולהתקנה — לוקח דקה בערך.`,
+`<b>סגור את החלון ופתח PowerShell חדש.</b> זה קריטי: התקנה מעדכנת את רשימת התוכניות רק בחלונות שנפתחים אחריה.`,
+`בדוק שהצליח: <span class="kbd">claude --version</span>`,
+`להפעלה ראשונה: היכנס לתיקיית הפרויקט והרץ <span class="kbd">claude</span>. ייפתח דפדפן להתחברות לחשבון שלך.`
+],
+check:`הפקודה <span class="kbd">claude --version</span> מדפיסה מספר גרסה ואחריו <span class="kbd">(Claude Code)</span>.`,
+fix:`<b>"claude is not recognized"</b> — לא פתחת חלון חדש אחרי ההתקנה. סגור הכול ופתח מחדש. אם עדיין: הוסף את <span class="kbd">%USERPROFILE%\\.local\\bin</span> למשתנה ה-PATH של המשתמש.<br><b>שגיאה על <span class="kbd">&amp;&amp;</span></b> — אתה ב-CMD ולא ב-PowerShell.<br><b>ההתקנה נכשלת</b> — נסה דרך חלופית: <span class="kbd">winget install Anthropic.ClaudeCode</span>`});
+
 add("m4","l4",{t:"התקנת Git for Windows (מומלץ לפני Claude Code)",
 req:`Windows · הרשאת התקנה במחשב`,
 steps:[
@@ -5929,36 +5960,64 @@ function openChat(){
 }
 /* Free path (the default): compose a question here, open it in Claude with the
    viewer's own subscription. No key, no cost, works for everyone. */
+/* The in-app tutor is the default: it answers instantly from the course
+   material, on the device, with no network. "Open in Claude" stays one tap
+   away for anything outside the course. */
+function askInClaude(q){
+  const ctx=chatContext();
+  const full=(ctx?"אני לומד בקורס \"קלוד מאסטר\" בעברית. "+ctx+"\n\n":"")+"השאלה שלי: "+q+
+    "\n\nענה בעברית פשוטה, והסבר כל מונח טכני. אני מתחיל בלי רקע טכני, עובד על Windows, ויש לי מנוי Claude Pro.";
+  window.open(CLAUDE_NEW+encodeURIComponent(full),"_blank","noopener");
+}
 function renderFree(){
   const body=$("#chatbody"); if(!body)return;
-  $("#chatfoot").style.display="none";
+  $("#chatfoot").style.display="flex";
   const ctx=chatContext();
-  body.innerHTML='<div class="keyform">'+
-    '<div class="center" style="margin-bottom:14px"><div style="font-size:34px">✨</div>'+
-    '<p class="sub" style="margin-top:6px">כתוב את השאלה שלך, ואפתח לך אותה בקלוד — עם המנוי הרגיל שלך, בלי עלות נוספת.</p></div>'+
-    (ctx?'<div class="ht-req" style="margin-bottom:11px">📍 אצרף אוטומטית את ההקשר: '+esc(ctx)+'</div>':'')+
-    '<textarea id="freeq" rows="4" placeholder="מה תרצה לשאול?" style="width:100%;font-family:inherit;font-size:16px;'+
-      'background:var(--bg2);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--ink);resize:vertical"></textarea>'+
-    '<button class="btn wide mt" id="freego">✨ פתח את השאלה בקלוד</button>'+
-    '<div class="suggest">'+
-      ['הסבר לי את השיעור הזה במילים פשוטות','תן לי דוגמה מהחיים שלי','אני תקוע — מה לעשות?','בחן אותי על מה שלמדתי']
-        .map(s=>'<button>'+s+'</button>').join("")+'</div>'+
-    '<div class="center" style="margin-top:22px;padding-top:16px;border-top:1px solid var(--line)">'+
-      '<button class="btn ghost" id="toadv" style="font-size:13px;color:var(--ink3)">אפשרות למתקדמים: תשובות בתוך האפליקציה ›</button></div>'+
-  '</div>';
-  const go=()=>{
-    const q=$("#freeq").value.trim();
-    if(!q){toast("כתוב שאלה קודם");return}
-    const full=(ctx?"אני לומד בקורס \"קלוד מאסטר\" בעברית. "+ctx+"\n\n":"")+"השאלה שלי: "+q+
-      "\n\nענה בעברית פשוטה, והסבר כל מונח טכני. אני מתחיל בלי רקע טכני, עובד על Windows, ויש לי מנוי Claude Pro.";
-    window.open(CLAUDE_NEW+encodeURIComponent(full),"_blank","noopener");
-  };
-  $("#freego").onclick=go;
-  $("#freeq").onkeydown=e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey))go()};
-  body.querySelectorAll(".suggest button").forEach(b=>b.onclick=()=>{$("#freeq").value=b.textContent;go()});
-  $("#toadv").onclick=()=>renderKeyForm(false);
+  TUT.log=TUT.log||[];
+  if(!TUT.log.length){
+    body.innerHTML='<div class="center" style="padding:14px 6px 4px"><div style="font-size:34px">🎓</div>'+
+      '<p class="sub" style="margin-top:6px">שאל אותי כל דבר על החומר. אני עונה מיד מתוך הקורס — בלי אינטרנט ובלי עלות.</p></div>'+
+      (ctx?'<div class="ht-req">📍 '+esc(ctx)+'</div>':'')+
+      '<div class="suggest">'+
+        ['מה זה הקשר?','איך מתקינים Claude Code?','אני תקוע — מה לעשות?','בחן אותי','תן לי דוגמה']
+          .map(s=>'<button>'+s+'</button>').join("")+'</div>';
+    body.querySelectorAll(".suggest button").forEach(b=>b.onclick=()=>{
+      $("#chatinput").value=b.textContent; sendTutor();
+    });
+  }
+  const inp=$("#chatinput");
+  inp.placeholder="שאל כל שאלה על החומר…";
+  inp.oninput=()=>{inp.style.height="auto";inp.style.height=Math.min(inp.scrollHeight,120)+"px"};
+  inp.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendTutor()}};
+  $("#chatsend").onclick=sendTutor;
+}
+const TUT={log:[]};
+function sendTutor(){
+  const inp=$("#chatinput"), q=inp.value.trim();
+  if(!q)return;
+  const body=$("#chatbody");
+  if(!TUT.log.length)body.innerHTML="";
+  TUT.log.push(q);
+  inp.value=""; inp.style.height="auto";
+  body.insertAdjacentHTML("beforeend",'<div class="cmsg me">'+esc(q)+'</div>');
+  let res;
+  try{ res=TUTOR.answer(q); }catch(e){ res={ok:false}; }
+  const wrap=document.createElement("div");
+  wrap.className="cmsg ai tut";
+  if(res.ok){
+    wrap.innerHTML=res.html+
+      '<div class="tut-foot">לא זה מה שחיפשת? <a href="#" class="tut-link" data-ask>שאל את קלוד עצמו ←</a></div>';
+  }else{
+    wrap.innerHTML='<div class="tut-miss"><b>לא מצאתי את זה בחומר הקורס.</b><br>'+
+      'אני יודע לענות על כל מה שנמצא ב-17 המודולים. לשאלות אחרות — קלוד עצמו יענה לך טוב יותר.'+
+      '<br><br><button class="btn sm" data-ask>✨ שאל את קלוד</button></div>';
+  }
+  body.appendChild(wrap);
+  wrap.querySelectorAll("[data-ask]").forEach(a=>a.onclick=e=>{e.preventDefault();askInClaude(q)});
+  body.scrollTop=body.scrollHeight;
 }
 function closeChat(){CHAT.open=false;const s=$("#chatsheet");if(s)s.remove()}
+window.closeChat=closeChat;   /* referenced from links the tutor renders */
 function renderKeyForm(fromSettings){
   const body=$("#chatbody"); if(!body)return;
   $("#chatfoot").style.display="none";
@@ -6070,6 +6129,354 @@ async function sendChat(){
   }
 }
 $("#chatfab").onclick=openChat;
+
+/* ===================== TUTOR — a local answer engine =====================
+   Built from scratch for this app. No server, no API key, no third party,
+   no network. It indexes every passage already written in the course,
+   works out what a question is asking for, ranks the material against it,
+   and composes an answer. Everything runs on the device, offline, forever.
+   ------------------------------------------------------------------------ */
+const TUTOR = {
+  units: null,
+  idf: null,
+
+  /* --- Hebrew normalisation ---------------------------------------------
+     Hebrew writes the same word many ways: final letters change shape at the
+     end of a word, and one-letter prefixes (ו/ה/ב/ל/מ/ש/כ) glue straight onto
+     the stem, so "בהקשר" and "הקשר" look unrelated.
+
+     Stripping the prefix outright is wrong: it would also eat the first letter
+     of words that merely start with one of those letters ("מכשירים" → "כשירים").
+     So a word emits BOTH forms — the word itself and its stripped variant — and
+     a match on either counts. "הקשר" gives [הקשר, קשר]; "בהקשר" gives
+     [בהקשר, הקשר]; they meet on "הקשר", while "מכשירים" keeps itself intact. */
+  norm(w){
+    return w.replace(/ך/g,"כ").replace(/ם/g,"מ").replace(/ן/g,"נ")
+            .replace(/ף/g,"פ").replace(/ץ/g,"צ");
+  },
+  /* Hebrew verbs and their nouns share a root but not a spelling: someone asks
+     "איך מתקינים" while the guide is titled "התקנת". Letter-level tricks can't
+     bridge that, so the app carries a small lexicon of the actions it actually
+     teaches. Every member of a group also emits the group's first form, which
+     is what makes question and answer meet. */
+  SYN: [
+    ["התקנ","התקנה","התקנת","מתקינ","מתקינימ","להתקינ","מותקנ","התקינ","מתקינה"],
+    ["יציר","יצירה","יצירת","יוצר","יוצרימ","ליצור","נוצר","בונ","לבנות","בונימ","בנייה","בניית"],
+    ["חיבור","לחבר","מחבר","מחברימ","מחובר","מחוברת","לחברמ"],
+    ["שמיר","לשמור","שומר","שמירה","נשמר","שומרימ"],
+    ["הפעל","להפעיל","מפעיל","הפעלה","מופעל","מפעילימ"],
+    ["פרסומ","לפרסמ","מפרסמ","פרסמ","מפורסמ"],
+    ["תכנונ","לתכננ","מתכננ","תכננ","תוכנית","תכנית","תכנונ"],
+    ["סנכרונ","לסנכרנ","מסנכרנ","סנכרנ","מסונכרנ"],
+    ["בדיק","לבדוק","בודק","בדיקה","נבדק","בודקימ"],
+    ["מחיק","למחוק","מוחק","מחיקה","נמחק"],
+    ["עריכ","לערוכ","עורכ","עריכה","נערכ"],
+    ["שיתופ","לשתפ","משתפ","שיתופ","משותפ"]
+  ],
+  root(w){
+    if(!this._rootMap){
+      this._rootMap = {};
+      this.SYN.forEach(g => g.forEach(f => this._rootMap[f] = g[0]));
+    }
+    return this._rootMap[w];
+  },
+  variants(w){
+    const base = this.norm(w);
+    const out = [base];
+    if(base.length > 3 && /^[והבלמשכ]/.test(base))   out.push(base.slice(1));
+    if(base.length > 5 && /^[וש][הבלמכ]/.test(base)) out.push(base.slice(2));
+    out.slice().forEach(v => { const r = this.root(v); if(r && out.indexOf(r) < 0) out.push(r); });
+    return out;
+  },
+  /* Question words are deliberately here: they tell us the *intent*, and
+     intent() already reads them. Leaving them in the search terms only drags
+     long chatty passages to the top, because they appear everywhere. */
+  STOP: new Set(["את","של","על","עם","זה","זו","הוא","היא","אני","אתה","הם","הן","יש","אין",
+    "לא","כן","אם","או","גם","רק","כל","כדי","יותר","פחות","אבל","כי","אז","הכי","מאוד","עוד",
+    "כמו","בין","אחרי","לפני","תוך","בלי","האם","וגם","שלי","שלך","שלו","להם","לי","לו","אשר",
+    "כאשר","אותו","אותה","להיות","בו","בה",
+    "מה","מהו","מהי","איך","כיצד","למה","מדוע","האם","תן","תסביר","הסבר","רוצה","צריך","אפשר",
+    "the","and","for","you","this","that","with","what","how","why","does","can"]),
+
+  tokens(s){
+    const out = [];
+    (s || "").toLowerCase()
+      .replace(/[^֐-׿a-z0-9\s]/g, " ")
+      .split(/\s+/)
+      .filter(w => w.length > 1 && !this.STOP.has(w))
+      .forEach(w => this.variants(w).forEach(v => out.push(v)));
+    return out;
+  },
+
+  /* --- index -------------------------------------------------------------
+     Every lesson is split at its headings, and each box, how-to card and
+     prompt example becomes its own retrievable unit with a type tag. */
+  build(){
+    if(this.units) return this.units;
+    const U = [], tmp = document.createElement("div");
+    const push = o => { o.tok = this.tokens(o.title + " " + o.text); U.push(o); };
+
+    MODS.forEach(m => {
+      m.lessons.forEach(l => {
+        tmp.innerHTML = l.html;
+        const at = {mid:m.id, lid:l.id, mod:m.title, lesson:l.title, url:"#l/"+m.id+"/"+l.id};
+        let head = l.title, buf = [];
+        const flush = () => {
+          const text = buf.join(" ").replace(/\s+/g," ").trim();
+          if(text.length > 60) push(Object.assign({kind:"passage", title:head, text:text, html:null}, at));
+          buf = [];
+        };
+        [...tmp.children].forEach(el => {
+          if(el.tagName === "H2"){ flush(); head = el.textContent.trim(); return; }
+          if(el.classList.contains("howto")){
+            const b = el.querySelector("b");
+            push(Object.assign({kind:"howto", title:b?b.textContent:"מדריך הפעלה",
+              text:el.textContent, html:el.outerHTML}, at));
+            const fix = el.querySelector(".ht-fix");
+            if(fix) push(Object.assign({kind:"fix", title:"פתרון תקלות · "+l.title,
+              text:fix.textContent, html:fix.outerHTML}, at));
+            const how = el.querySelector(".box.info");
+            if(how) push(Object.assign({kind:"how", title:"איך זה עובד · "+l.title,
+              text:how.textContent, html:how.outerHTML}, at));
+            return;
+          }
+          if(el.classList.contains("box")){
+            const kind = el.classList.contains("pro")  ? "key"
+                       : el.classList.contains("warn") ? "warn"
+                       : el.classList.contains("try")  ? "try" : "note";
+            push(Object.assign({kind:kind, title:head, text:el.textContent, html:el.outerHTML}, at));
+            return;
+          }
+          if(el.classList.contains("prompt-ex")){
+            push(Object.assign({kind:"example", title:head, text:el.textContent, html:el.outerHTML}, at));
+            return;
+          }
+          if(el.classList.contains("tbl-wrap") || el.tagName === "TABLE"){
+            push(Object.assign({kind:"table", title:head, text:el.textContent, html:el.outerHTML}, at));
+            return;
+          }
+          buf.push(el.textContent);
+        });
+        flush();
+      });
+      m.exercises.forEach(x => push({kind:"exercise", title:x.title,
+        text:x.goal+" "+x.steps.join(" "), html:null,
+        mid:m.id, lid:null, mod:m.title, lesson:x.title, url:"#x/"+m.id+"/"+x.id}));
+      m.quiz.forEach(q => push({kind:"quiz", title:q.q,
+        text:q.q+" "+q.opts[q.a]+" "+q.exp, html:null, q:q,
+        mid:m.id, lid:null, mod:m.title, lesson:q.q, url:"#m/"+m.id+"/quiz"}));
+    });
+
+    GLOSS.forEach(g => push({kind:"term", title:g.he+" · "+g.en,
+      text:g.he+" "+g.en+" "+g.def,
+      html:'<b style="color:var(--brand)">'+esc(g.he)+'</b> <span class="gen">'+esc(g.en)+'</span><p style="margin-top:4px">'+esc(g.def)+'</p>',
+      mid:null, lid:null, mod:"מילון המונחים", lesson:g.he, url:"#gloss"}));
+
+    /* inverse document frequency — a rare word says more than a common one */
+    const df = {};
+    U.forEach(u => new Set(u.tok).forEach(t => df[t] = (df[t]||0) + 1));
+    this.idf = {};
+    const N = U.length;
+    Object.keys(df).forEach(t => this.idf[t] = Math.log(1 + N/df[t]));
+    /* pre-compute the bag of terms and the average length, for BM25 below */
+    let total = 0;
+    U.forEach(u => {
+      const bag = {};
+      u.tok.forEach(t => bag[t] = (bag[t]||0) + 1);
+      u.bag = bag;
+      u.len = u.tok.length;
+      total += u.len;
+    });
+    this.avgLen = total / (U.length || 1);
+    this.units = U;
+    return U;
+  },
+
+  /* --- what is the question asking for? --------------------------------- */
+  intent(q){
+    const t = q.toLowerCase();
+    if(/בחן|תבחן|שאלות|מבחן|תרגל|לתרגל|שאל אותי/.test(t))            return "quiz";
+    if(/תקוע|לא עובד|שגיא|בעיה|נכשל|תקלה|נתקע|קרס|לא מצליח/.test(t)) return "fix";
+    /* "how does X work" is a request to understand, not a set of steps */
+    if(/איך (זה )?(עובד|פועל|בנוי)|כיצד (זה )?עובד|מה קורה כש/.test(t)) return "explain";
+    if(/איך|כיצד|להתקין|התקנה|להפעיל|שלבים|צעדים|מדריך/.test(t))     return "howto";
+    if(/דוגמ|למשל|תן לי דוג/.test(t))                                 return "example";
+    if(/מה זה|מהו|מהי|פירוש|משמעות|מונח|הגדרה/.test(t))              return "term";
+    if(/הסבר|פשוט|במילים פשוטות|לא הבנתי|תסביר|למה/.test(t))         return "explain";
+    return "search";
+  },
+
+  /* --- ranking (BM25) -----------------------------------------------------
+     Plain term-frequency lets a long rambling passage outscore a short exact
+     one, just by repeating a word. BM25 fixes both halves of that: term
+     frequency saturates (k1), and a document is penalised for being longer
+     than average (b). That is what makes a one-line glossary entry beat a
+     page of prose for "what is X". */
+  K1: 1.2,
+  B: 0.75,
+  /* an intent says which *kind* of passage answers it — a "how do I" question
+     wants the setup card, not a paragraph that happens to say "install" */
+  PREFER: {howto:{howto:1.7,table:1.15}, fix:{fix:2.0,warn:1.3,howto:1.2},
+           term:{term:1.5}, example:{example:1.7,try:1.2}, explain:{key:1.4,how:1.35}},
+  score(qt, u, ctxMid, ctxLid, intent){
+    const bag = u.bag, norm = this.K1 * (1 - this.B + this.B * (u.len / this.avgLen));
+    let s = 0;
+    const done = {};
+    qt.forEach(t => {
+      if(done[t]) return;
+      done[t] = 1;
+      let tf = bag[t] || 0;
+      if(!tf){                       /* prefix match catches inflections we missed */
+        for(const k in bag){
+          if(k.length > 3 && (k.indexOf(t) === 0 || t.indexOf(k) === 0)){ tf = bag[k] * 0.4; break; }
+        }
+      }
+      if(tf) s += (this.idf[t]||1) * (tf * (this.K1 + 1)) / (tf + norm);
+    });
+    if(!s) return 0;
+    /* Reward breadth of coverage. A passage that touches every word of the
+       question is answering it; one that matches a single common verb is
+       probably answering a different question. Kept as a gentle multiplier
+       rather than a penalty, so a strong partial match still surfaces. */
+    const uniq = {};
+    let asked = 0, met = 0;
+    qt.forEach(t => {
+      if(uniq[t]) return;
+      uniq[t] = 1;
+      if((this.idf[t] || 0) < 0.4) return;   /* ignore words that say nothing */
+      asked++;
+      if(bag[t]) { met++; return; }
+      for(const k in bag){
+        if(k.length > 3 && (k.indexOf(t) === 0 || t.indexOf(k) === 0)){ met++; break; }
+      }
+    });
+    if(asked) s *= 0.65 + 0.35 * (met / asked);
+    /* A hit in the title is worth far more than one buried in the body — but
+       only for a word that actually identifies the subject. Otherwise a
+       heading like "how do you create it?" wins every "how do you create X"
+       question, whatever X happens to be. */
+    const titleTok = u.titleTok || (u.titleTok = this.tokens(u.title));
+    let titleHits = 0;
+    const seen = {};
+    qt.forEach(t => {
+      if(seen[t] || (this.idf[t] || 0) < 1.0) return;
+      seen[t] = 1;
+      if(titleTok.indexOf(t) >= 0) titleHits++;
+    });
+    if(titleHits) s *= (1 + 0.9 * titleHits);
+    const pref = this.PREFER[intent];
+    if(pref && pref[u.kind]) s *= pref[u.kind];
+    if(ctxLid && u.lid === ctxLid)      s *= 1.5;   /* the lesson being read breaks ties */
+    else if(ctxMid && u.mid === ctxMid) s *= 1.2;
+    return s;
+  },
+
+  find(q, ctxMid, ctxLid, kinds, n, intent){
+    const qt = this.tokens(q);
+    if(!qt.length) return [];
+    return this.build()
+      .filter(u => !kinds || kinds.indexOf(u.kind) >= 0)
+      .map(u => ({u:u, s:this.score(qt, u, ctxMid, ctxLid, intent)}))
+      .filter(r => r.s > 1.5)
+      .sort((a,b) => b.s - a.s)
+      .slice(0, n || 4);
+  },
+  /* Knowing when NOT to answer.
+     Score alone can't decide it: "מתכון לעוגת שוקולד" scores higher than a real
+     question, because "מתכון" happens to appear in the Cowork module. The
+     honest signal is vocabulary — do the words of the question exist in this
+     course at all? "שוקולד" and "מונדיאל" do not, and that is what gives the
+     question away. Coverage decides whether to answer; the score decides how
+     confidently to phrase it. */
+  FLOOR: 8,
+  coverage(qt){
+    const seen = {};
+    let known = 0, total = 0;
+    qt.forEach(t => {
+      if(seen[t] || t.length < 2) return;
+      seen[t] = 1;
+      if(this.STOP.has(t)) return;
+      total++;
+      if(this.idf[t] !== undefined) known++;
+      else {
+        for(const k in this.idf){
+          if(k.length > 3 && (k.indexOf(t) === 0 || t.indexOf(k) === 0)){ known++; break; }
+        }
+      }
+    });
+    return total ? known / total : 0;
+  },
+
+  /* --- compose the answer ------------------------------------------------ */
+  answer(q){
+    const h = (location.hash||"").slice(1).split("/");
+    const ctxMid = (h[0]==="l"||h[0]==="x"||h[0]==="m") ? h[1] : null;
+    const ctxLid = (h[0]==="l") ? h[2] : null;
+    const it = this.intent(q);
+    const link = u => '<a class="tut-link" href="'+u.url+'" onclick="closeChat()">'+
+                      esc(u.mod)+' › '+esc(u.lesson)+'</a>';
+
+    if(it === "quiz"){
+      const m = ctxMid ? modById(ctxMid) : null;
+      const pool = m ? m.quiz : MODS.flatMap(x => x.quiz);
+      if(pool.length){
+        const pick = shuffle(pool).slice(0,3);
+        return {ok:true, html:
+          '<div class="tut-lead">בוא נבחן אותך'+(m ? " על "+esc(m.title) : "")+':</div>'+
+          pick.map((q,i) =>
+            '<div class="tut-q"><b>'+(i+1)+'. '+esc(q.q)+'</b>'+
+            '<div class="tut-ans">✅ '+esc(q.opts[q.a])+'</div>'+
+            '<div class="tut-exp">'+esc(q.exp)+'</div></div>').join("")+
+          '<div class="tut-foot">לסבב מלא — לשונית הבוחן במודול.</div>'};
+      }
+    }
+
+    const kindsFor = {
+      fix:     ["fix","warn","howto"],
+      howto:   ["howto","passage","key","table"],
+      example: ["example","try","passage"],
+      term:    ["term","passage","key"],
+      explain: ["key","how","passage","note","term"],
+      search:  null
+    }[it];
+
+    this.build();
+    if(this.coverage(this.tokens(q)) < 0.55) return {ok:false};
+
+    let hits = this.find(q, ctxMid, ctxLid, kindsFor, 4, it);
+    if(!hits.length) hits = this.find(q, ctxMid, ctxLid, null, 4, it);
+    if(!hits.length || hits[0].s < this.FLOOR) return {ok:false};
+    const unsure = hits[0].s < 14;
+
+    const lead = {
+      fix:     "נראה שזו הבעיה:",
+      howto:   "הנה איך עושים את זה:",
+      example: "הנה דוגמה מהחומר:",
+      term:    "הנה ההגדרה:",
+      explain: "הנה ההסבר:",
+      search:  "מצאתי את זה בחומר:"
+    }[it];
+
+    const top = hits[0].u;
+    let html = '<div class="tut-lead">'+(unsure ? "לא בטוח שזה מה שחיפשת, אבל זה הכי קרוב שמצאתי:" : lead)+
+      '</div><div class="tut-card">'+
+      (top.html ? top.html
+                : '<p>'+esc(top.text.slice(0,700))+(top.text.length>700 ? "…" : "")+'</p>')+
+      '<div class="tut-src">📍 '+link(top)+'</div></div>';
+
+    const rest = hits.slice(1);
+    if(rest.length){
+      html += '<div class="tut-more"><b>קשור לזה</b>'+
+        rest.map(r => '<div class="tut-rel">'+link(r.u)+
+          '<span>'+esc(r.u.text.replace(/\s+/g," ").slice(0,95))+'…</span></div>').join("")+
+        '</div>';
+    }
+    return {ok:true, html:html};
+  }
+};
+
+
+window.TUTOR=TUTOR;   /* exposed so the engine can be exercised directly */
 
 /* ---------- SW ---------- */
 if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost"||location.hostname==="127.0.0.1")){

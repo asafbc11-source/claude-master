@@ -117,6 +117,19 @@ check:`פתח שיחה חדשה ושאל "מה אתה זוכר עליי?" — א
 fix:`הזיכרון כבוי? בדוק ב-Settings ← Memory שהאפשרות מופעלת. שים לב שבשיחת אינקוגניטו הוא לא פועל בכוונה.`});
 
 /* ============ מודול 4 — Claude Code ============ */
+add("m4","l3",{t:"התקנת Claude Code על Windows",
+req:`מנוי Claude (Pro ומעלה) · Windows · הרשאת התקנה במחשב`,
+steps:[
+`פתח <b>PowerShell</b>: לחץ <span class="kbd">Win + X</span> ובחר "Terminal" או "Windows PowerShell". ודא שבתחילת השורה כתוב <span class="kbd">PS C:\\</span> — אם אין שם <span class="kbd">PS</span>, אתה ב-CMD והפקודה לא תעבוד.`,
+`העתק והדבק את הפקודה הזו, ולחץ Enter:<div class="code">irm https://claude.ai/install.ps1 | iex</div>`,
+`המתן להורדה ולהתקנה — לוקח דקה בערך.`,
+`<b>סגור את החלון ופתח PowerShell חדש.</b> זה קריטי: התקנה מעדכנת את רשימת התוכניות רק בחלונות שנפתחים אחריה.`,
+`בדוק שהצליח: <span class="kbd">claude --version</span>`,
+`להפעלה ראשונה: היכנס לתיקיית הפרויקט והרץ <span class="kbd">claude</span>. ייפתח דפדפן להתחברות לחשבון שלך.`
+],
+check:`הפקודה <span class="kbd">claude --version</span> מדפיסה מספר גרסה ואחריו <span class="kbd">(Claude Code)</span>.`,
+fix:`<b>"claude is not recognized"</b> — לא פתחת חלון חדש אחרי ההתקנה. סגור הכול ופתח מחדש. אם עדיין: הוסף את <span class="kbd">%USERPROFILE%\\.local\\bin</span> למשתנה ה-PATH של המשתמש.<br><b>שגיאה על <span class="kbd">&amp;&amp;</span></b> — אתה ב-CMD ולא ב-PowerShell.<br><b>ההתקנה נכשלת</b> — נסה דרך חלופית: <span class="kbd">winget install Anthropic.ClaudeCode</span>`});
+
 add("m4","l4",{t:"התקנת Git for Windows (מומלץ לפני Claude Code)",
 req:`Windows · הרשאת התקנה במחשב`,
 steps:[
