@@ -144,10 +144,31 @@ const TUTOR = {
     const where = d => (d.meta.mod||"") + (d.meta.lesson ? " › " + d.meta.lesson : "");
     const link = d => '<a class="tut-link" href="'+d.url+'" onclick="closeChat()">'+esc(where(d))+'</a>';
 
-    let html = '<div class="tut-lead">'+esc(a.lead)+'</div><div class="tut-card">'+
-      (a.doc.html ? a.doc.html
-                  : '<p>'+esc(a.doc.text.slice(0,700))+(a.doc.text.length>700?"…":"")+'</p>')+
-      '<div class="tut-src">📍 '+link(a.doc)+'</div></div>';
+    /* The engine composes the answer out of the lines that matter. A setup
+       card is the exception — its own layout carries the steps better than a
+       paraphrase would, so it is shown whole. */
+    let body = "";
+    const cardIsSetup = a.doc.tags && a.doc.tags.indexOf("howto") >= 0 && a.doc.html;
+    if(cardIsSetup){
+      body = a.doc.html;
+    }else{
+      (a.sections||[]).forEach(s => {
+        if(s.type === "steps"){
+          body += '<ol class="tut-steps">'+s.items.map(t => "<li>"+esc(t)+"</li>").join("")+'</ol>';
+        }else if(s.type === "points"){
+          body += '<ul class="tut-points">'+s.items.map(p =>
+            "<li>"+esc(p.text)+(p.doc ? ' <span class="tut-from">'+link(p.doc)+'</span>' : "")+"</li>"
+          ).join("")+'</ul>';
+        }else{
+          body += "<p>"+esc(s.text)+"</p>";
+        }
+      });
+      if(!body) body = '<p>'+esc(a.doc.text.slice(0,700))+(a.doc.text.length>700?"…":"")+'</p>';
+    }
+
+    let html = '<div class="tut-lead">'+esc(a.lead)+
+      (res.carriedContext ? ' <span class="tut-ctx">(בהמשך לשאלה הקודמת)</span>' : "")+
+      '</div><div class="tut-card">'+body+'<div class="tut-src">📍 '+link(a.doc)+'</div></div>';
     if(a.related.length){
       html += '<div class="tut-more"><b>קשור לזה</b>'+a.related.map(d =>
         '<div class="tut-rel">'+link(d)+'<span>'+

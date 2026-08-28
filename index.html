@@ -245,6 +245,13 @@ body.has-voice .fab{bottom:calc(150px + env(safe-area-inset-bottom))}
 .tut-ans{color:var(--ok);font-weight:700;margin-top:6px}
 .tut-exp{color:var(--ink2);font-size:13.5px;margin-top:5px;line-height:1.55}
 .tut-foot{font-size:13px;color:var(--ink3);margin-top:8px}
+.tut-steps,.tut-points{padding-right:20px;margin:0}
+.tut-steps li,.tut-points li{margin-bottom:7px;line-height:1.6}
+.tut-points{list-style:none;padding-right:0}
+.tut-points li{position:relative;padding-right:16px}
+.tut-points li::before{content:"•";position:absolute;right:0;color:var(--brand);font-weight:800}
+.tut-from{font-size:12px}
+.tut-ctx{font-size:12.5px;color:var(--ink3)}
 .tut-miss{background:var(--warn-soft);border-radius:var(--rs);padding:12px 14px;font-size:15px;line-height:1.6}
 .cmsg.tut{max-width:100%;background:none;border:none;padding:0}
 .keyform{max-width:460px;margin:0 auto}
@@ -6532,21 +6539,37 @@ $("#chatfab").onclick=openChat;
   Engine.prototype.ask = function (q, opts) {
     opts = opts || {};
     this.build();
-    var groups = this.terms(q);
+
+    var resolved = this._resolve(q);
+    var query = resolved.text;
+
+    var groups = this.terms(query);
     if (!groups.length) return { ok: false, reason: "empty" };
 
+    /* A follow-up carries the previous subject, which already passed this gate.
+       Its own words ("and what about that one?") are mostly unknown by nature,
+       so re-testing the merged text would reject a question we understand. */
     var cover = this.coverage(groups);
-    if (cover < this.minCover) return { ok: false, reason: "out-of-scope", coverage: cover };
+    if (!resolved.carried && cover < this.minCover) {
+      return { ok: false, reason: "out-of-scope", coverage: cover };
+    }
 
     var intent = this.intentOf(q);
-    var hits = this.search(q, { intent: intent, limit: (opts.related || this.related) + 1, boost: opts.boost });
-    if (!hits.length) hits = this.search(q, { intent: intent, tags: null, limit: 4, boost: opts.boost });
+    var want = Math.max((opts.related || this.related) + 1, 4);
+    var hits = this.search(query, { intent: intent, limit: want, boost: opts.boost });
+    if (!hits.length) hits = this.search(query, { intent: intent, tags: null, limit: want, boost: opts.boost });
     if (!hits.length || hits[0].relevance < this.floor) {
       return { ok: false, reason: "no-match", coverage: cover,
                best: hits.length ? hits[0].relevance : 0 };
     }
 
+    /* remember the subject, so the next short question is understood */
+    this._lastQuery = query;
+    this._lastTerms = groups;
+
     var unsure = hits[0].relevance < this.unsureAt;
+    var composed = this.compose(query, hits, intent.name);
+
     return {
       ok: true,
       intent: intent.name,
@@ -6554,14 +6577,187 @@ $("#chatfab").onclick=openChat;
       score: hits[0].score,
       relevance: hits[0].relevance,
       coverage: cover,
+      carriedContext: resolved.carried,
       answer: {
         lead: unsure
           ? (this.labels.unsure || "This is the closest match I found:")
           : (this.labels[intent.name] || this.labels.search || "Here is what I found:"),
         doc: hits[0].doc,
-        related: hits.slice(1).map(function (h) { return h.doc; })
-      }
+        related: hits.slice(1).map(function (h) { return h.doc; }),
+        sections: composed.sections,
+        text: composed.text
+      },
+      sources: hits.map(function (h) { return h.doc; })
     };
+  };
+
+  /**
+   * Retrieval-augmented generation.
+   *
+   * The engine finds the passages that matter and hands them to a generator
+   * you supply, which writes the actual answer. That generator is the only
+   * part that needs a model — everything else stays local. Pass any function
+   * of the shape `({question, context, sources}) => Promise<string>`: an
+   * Anthropic call, another provider, a model running on device, anything.
+   *
+   *   const res = await engine.generate("compare A and B", {
+   *     generator: async ({question, context}) => callYourModel(question, context)
+   *   });
+   *
+   * Without a generator it falls back to ask(), so the same code path works
+   * whether or not a model is available.
+   */
+  Engine.prototype.generate = function (q, opts) {
+    opts = opts || {};
+    var gen = opts.generator || this.generator;
+    var base = this.ask(q, opts);
+    if (!gen) return Promise.resolve(assign({}, base, { generated: false }));
+    if (!base.ok && base.reason === "out-of-scope" && !opts.answerAnything) {
+      return Promise.resolve(assign({}, base, { generated: false }));
+    }
+
+    var hits = base.ok ? base.sources : this.search(q, { limit: opts.contextDocs || 5 }).map(function (h) { return h.doc; });
+    var budget = opts.contextChars || 6000;
+    var context = "", used = [];
+    for (var i = 0; i < hits.length && context.length < budget; i++) {
+      var d = hits[i];
+      var chunk = "### " + d.title + "\n" + d.text + "\n\n";
+      if (context.length + chunk.length > budget) chunk = chunk.slice(0, budget - context.length);
+      context += chunk;
+      used.push(d);
+    }
+
+    return Promise.resolve(gen({ question: q, context: context, sources: used, intent: base.intent }))
+      .then(function (text) {
+        return assign({}, base, { ok: true, generated: true, text: text, sources: used });
+      })
+      .catch(function (err) {
+        return assign({}, base, { generated: false, generatorError: String(err && err.message || err) });
+      });
+  };
+
+  /* =====================================================================
+     COMPOSING AN ANSWER
+     Returning a whole passage is blunt: most of it is not what was asked.
+     The composer scores the passage sentence by sentence, keeps the lines
+     that carry the answer, and assembles them into sections shaped by the
+     intent — a definition reads differently from a set of steps.
+     It never invents a sentence. Every line comes from the material.
+     ===================================================================== */
+
+  /** Split prose into sentences. Hebrew and English share the punctuation. */
+  Engine.prototype.sentences = function (text) {
+    return String(text || "")
+      .replace(/\s+/g, " ")
+      .split(/(?<=[.!?:;])\s+|(?:\s+[·•]\s+)/)
+      .map(function (s) { return s.trim(); })
+      .filter(function (s) { return s.length > 15; });
+  };
+
+  /** The sentences of a text that best answer this query, in original order. */
+  Engine.prototype.keySentences = function (text, qt, limit) {
+    var sents = this.sentences(text);
+    if (sents.length <= 1) return sents;
+    var self = this;
+    var scored = sents.map(function (s, i) {
+      var bag = {};
+      self.tokens(s).forEach(function (t) { bag[t] = (bag[t] || 0) + 1; });
+      var sc = 0, seen = {};
+      qt.forEach(function (t) {
+        if (seen[t]) return;
+        seen[t] = 1;
+        if (bag[t]) sc += (self.idf[t] || 1);
+        else for (var k in bag) {
+          if (k.length > 3 && (k.indexOf(t) === 0 || t.indexOf(k) === 0)) { sc += (self.idf[t] || 1) * 0.4; break; }
+        }
+      });
+      /* an opening sentence usually states the thing itself */
+      if (i === 0) sc += 0.8;
+      return { s: s, i: i, sc: sc };
+    });
+    var keep = scored.slice().sort(function (a, b) { return b.sc - a.sc; })
+                     .slice(0, limit || 3).filter(function (r) { return r.sc > 0; });
+    if (!keep.length) keep = scored.slice(0, 1);
+    return keep.sort(function (a, b) { return a.i - b.i; }).map(function (r) { return r.s; });
+  };
+
+  /** Pull an ordered list out of a document's html, when it has one. */
+  function listFrom(html) {
+    if (!html || typeof document === "undefined") return null;
+    var d = document.createElement("div");
+    d.innerHTML = html;
+    var li = d.querySelectorAll("li");
+    if (li.length < 2) return null;
+    return Array.prototype.map.call(li, function (n) {
+      return n.textContent.replace(/\s+/g, " ").trim();
+    }).filter(function (t) { return t.length > 2; });
+  }
+
+  /**
+   * Build a structured answer from the ranked hits.
+   * @returns {{sections: Array, text: string}}
+   *   section = { type: "lead"|"steps"|"points"|"quote"|"note", title?, items?, text? }
+   */
+  Engine.prototype.compose = function (q, hits, intent) {
+    var qt = this.tokens(q), self = this, sections = [], used = {};
+    var top = hits[0].doc;
+
+    /* how-to and fix questions want the steps, if the source has them */
+    if (intent === "howto" || intent === "fix") {
+      var steps = listFrom(top.html);
+      if (steps && steps.length) {
+        sections.push({ type: "steps", title: top.title, items: steps.slice(0, 8), doc: top });
+        used[top.id] = 1;
+      }
+    }
+
+    /* the core of the answer: the lines that actually address the question */
+    if (!used[top.id]) {
+      var lines = this.keySentences(top.text, qt, intent === "define" ? 2 : 3);
+      sections.push({ type: "lead", title: top.title, text: lines.join(" "), doc: top });
+      used[top.id] = 1;
+    }
+
+    /* other passages that add something the first one did not say */
+    var extra = [];
+    hits.slice(1).forEach(function (h) {
+      if (used[h.doc.id] || extra.length >= 3) return;
+      var line = self.keySentences(h.doc.text, qt, 1)[0];
+      if (!line) return;
+      /* skip anything that merely repeats what has been said */
+      var already = sections.map(function (s) { return s.text || (s.items || []).join(" "); }).join(" ");
+      var lineTok = self.tokens(line), overlapTok = self.tokens(already), same = 0;
+      lineTok.forEach(function (t) { if (overlapTok.indexOf(t) >= 0) same++; });
+      if (lineTok.length && same / lineTok.length > 0.8) return;
+      extra.push({ text: line, doc: h.doc });
+    });
+    if (extra.length) sections.push({ type: "points", title: null, items: extra });
+
+    var text = sections.map(function (s) {
+      if (s.type === "steps") return s.items.map(function (t, i) { return (i + 1) + ". " + t; }).join("\n");
+      if (s.type === "points") return s.items.map(function (p) { return "• " + p.text; }).join("\n");
+      return s.text;
+    }).join("\n\n");
+
+    return { sections: sections, text: text };
+  };
+
+  /* =====================================================================
+     FOLLOW-UP QUESTIONS
+     "And what about the second one?" carries almost no words of its own.
+     The engine keeps the terms of the last real question and merges them in,
+     so a short follow-up is understood in the context it was asked.
+     ===================================================================== */
+
+  Engine.prototype._resolve = function (q) {
+    var groups = this.terms(q);
+    var contentful = groups.filter(function (g) { return g.word.length > 2; });
+    var isFollowUp = contentful.length <= 2 &&
+      /^(ומה|ואיך|ולמה|ואם|ובאיזה|וזה|אז מה|ומתי|and |what about|and how)/i.test(q.trim());
+    if (isFollowUp && this._lastTerms && this._lastTerms.length) {
+      return { text: q + " " + this._lastQuery, carried: true };
+    }
+    return { text: q, carried: false };
   };
 
   /** Index size and vocabulary, useful when tuning. */
@@ -6641,23 +6837,47 @@ $("#chatfab").onclick=openChat;
       return '<div class="' + cls + '-miss">' +
         escapeHTML(opts.missText || "I could not find that in the material.") + '</div>';
     }
-    var a = res.answer;
-    var body = a.doc.html || "<p>" + escapeHTML(a.doc.text.slice(0, 700)) +
-               (a.doc.text.length > 700 ? "…" : "") + "</p>";
-    var html = '<div class="' + cls + '-lead">' + escapeHTML(a.lead) + '</div>' +
-               '<div class="' + cls + '-card">' + body;
-    if (a.doc.url || a.doc.title) {
-      html += '<div class="' + cls + '-src">' +
-        (a.doc.url ? '<a class="' + cls + '-link" href="' + escapeHTML(a.doc.url) + '">' +
-                     escapeHTML(a.doc.title) + '</a>'
-                   : escapeHTML(a.doc.title)) + '</div>';
+    /* a generator wrote the answer */
+    if (res.generated) {
+      return '<div class="' + cls + '-lead">' + escapeHTML(res.answer ? res.answer.lead : "") + '</div>' +
+        '<div class="' + cls + '-card">' + escapeHTML(res.text).replace(/\n/g, "<br>") +
+        (res.sources && res.sources.length
+          ? '<div class="' + cls + '-src">' + res.sources.map(function (d) {
+              return d.url ? '<a class="' + cls + '-link" href="' + escapeHTML(d.url) + '">' +
+                             escapeHTML(d.title) + '</a>' : escapeHTML(d.title);
+            }).join(" · ") + '</div>'
+          : "") + '</div>';
     }
-    html += '</div>';
-    if (a.related.length) {
+
+    var a = res.answer;
+    var link = function (d) {
+      return d.url ? '<a class="' + cls + '-link" href="' + escapeHTML(d.url) + '">' + escapeHTML(d.title) + '</a>'
+                   : escapeHTML(d.title);
+    };
+    var html = '<div class="' + cls + '-lead">' + escapeHTML(a.lead) + '</div><div class="' + cls + '-card">';
+
+    if (opts.raw && a.doc.html) {
+      html += a.doc.html;
+    } else {
+      (a.sections || []).forEach(function (s) {
+        if (s.type === "steps") {
+          html += '<ol class="' + cls + '-steps">' +
+            s.items.map(function (t) { return "<li>" + escapeHTML(t) + "</li>"; }).join("") + '</ol>';
+        } else if (s.type === "points") {
+          html += '<ul class="' + cls + '-points">' + s.items.map(function (p) {
+            return "<li>" + escapeHTML(p.text) +
+              (p.doc && p.doc.url ? ' <span class="' + cls + '-from">' + link(p.doc) + '</span>' : "") + "</li>";
+          }).join("") + '</ul>';
+        } else {
+          html += "<p>" + escapeHTML(s.text) + "</p>";
+        }
+      });
+    }
+    html += '<div class="' + cls + '-src">' + link(a.doc) + '</div></div>';
+
+    if (a.related && a.related.length) {
       html += '<div class="' + cls + '-more">' + a.related.map(function (d) {
-        return '<div class="' + cls + '-rel">' +
-          (d.url ? '<a class="' + cls + '-link" href="' + escapeHTML(d.url) + '">' + escapeHTML(d.title) + '</a>'
-                 : escapeHTML(d.title)) +
+        return '<div class="' + cls + '-rel">' + link(d) +
           '<span>' + escapeHTML(d.text.replace(/\s+/g, " ").slice(0, 95)) + '…</span></div>';
       }).join("") + '</div>';
     }
@@ -6831,10 +7051,31 @@ const TUTOR = {
     const where = d => (d.meta.mod||"") + (d.meta.lesson ? " › " + d.meta.lesson : "");
     const link = d => '<a class="tut-link" href="'+d.url+'" onclick="closeChat()">'+esc(where(d))+'</a>';
 
-    let html = '<div class="tut-lead">'+esc(a.lead)+'</div><div class="tut-card">'+
-      (a.doc.html ? a.doc.html
-                  : '<p>'+esc(a.doc.text.slice(0,700))+(a.doc.text.length>700?"…":"")+'</p>')+
-      '<div class="tut-src">📍 '+link(a.doc)+'</div></div>';
+    /* The engine composes the answer out of the lines that matter. A setup
+       card is the exception — its own layout carries the steps better than a
+       paraphrase would, so it is shown whole. */
+    let body = "";
+    const cardIsSetup = a.doc.tags && a.doc.tags.indexOf("howto") >= 0 && a.doc.html;
+    if(cardIsSetup){
+      body = a.doc.html;
+    }else{
+      (a.sections||[]).forEach(s => {
+        if(s.type === "steps"){
+          body += '<ol class="tut-steps">'+s.items.map(t => "<li>"+esc(t)+"</li>").join("")+'</ol>';
+        }else if(s.type === "points"){
+          body += '<ul class="tut-points">'+s.items.map(p =>
+            "<li>"+esc(p.text)+(p.doc ? ' <span class="tut-from">'+link(p.doc)+'</span>' : "")+"</li>"
+          ).join("")+'</ul>';
+        }else{
+          body += "<p>"+esc(s.text)+"</p>";
+        }
+      });
+      if(!body) body = '<p>'+esc(a.doc.text.slice(0,700))+(a.doc.text.length>700?"…":"")+'</p>';
+    }
+
+    let html = '<div class="tut-lead">'+esc(a.lead)+
+      (res.carriedContext ? ' <span class="tut-ctx">(בהמשך לשאלה הקודמת)</span>' : "")+
+      '</div><div class="tut-card">'+body+'<div class="tut-src">📍 '+link(a.doc)+'</div></div>';
     if(a.related.length){
       html += '<div class="tut-more"><b>קשור לזה</b>'+a.related.map(d =>
         '<div class="tut-rel">'+link(d)+'<span>'+
