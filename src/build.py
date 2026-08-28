@@ -18,14 +18,26 @@ shell = read(os.path.join(HERE, "shell.html"))
 TUTOR_MARKER = "/*==TUTOR==*/"
 if TUTOR_MARKER in shell:
     # AskEngine is a standalone library shared across projects; tutor.js is the
-    # thin adapter that feeds this course into it.
-    engine_lib = os.path.join(ROOT, "..", "tools", "ask-engine", "ask-engine.js")
-    parts_tutor = []
-    if os.path.exists(engine_lib):
-        parts_tutor.append(read(engine_lib))
+    # thin adapter that feeds this course into it. The canonical copy lives in
+    # ../tools, outside this repo, so a copy is vendored in on every build —
+    # that keeps a fresh clone buildable without hunting for the library.
+    canonical = os.path.join(ROOT, "..", "tools", "ask-engine", "ask-engine.js")
+    vendored = os.path.join(HERE, "lib", "ask-engine.js")
+    if os.path.exists(canonical):
+        lib = read(canonical)
+        d = os.path.dirname(vendored)
+        if not os.path.isdir(d):
+            os.makedirs(d)
+        if not os.path.exists(vendored) or read(vendored) != lib:
+            with io.open(vendored, "w", encoding="utf-8") as f:
+                f.write(lib)
+            print("vendored ask-engine.js -> src/lib/")
+    elif os.path.exists(vendored):
+        lib = read(vendored)
+        print("using vendored ask-engine.js (canonical copy not found)")
     else:
-        raise SystemExit("missing library: %s" % engine_lib)
-    parts_tutor.append(read(os.path.join(HERE, "tutor.js")))
+        raise SystemExit("missing ask-engine.js in ../tools/ask-engine/ and src/lib/")
+    parts_tutor = [lib, read(os.path.join(HERE, "tutor.js"))]
     shell = shell.replace(TUTOR_MARKER, "\n".join(parts_tutor), 1)
 if MARKER not in shell:
     sys.exit("marker not found in shell.html")
