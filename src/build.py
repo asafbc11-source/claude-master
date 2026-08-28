@@ -17,7 +17,16 @@ def read(p):
 shell = read(os.path.join(HERE, "shell.html"))
 TUTOR_MARKER = "/*==TUTOR==*/"
 if TUTOR_MARKER in shell:
-    shell = shell.replace(TUTOR_MARKER, read(os.path.join(HERE, "tutor.js")), 1)
+    # AskEngine is a standalone library shared across projects; tutor.js is the
+    # thin adapter that feeds this course into it.
+    engine_lib = os.path.join(ROOT, "..", "tools", "ask-engine", "ask-engine.js")
+    parts_tutor = []
+    if os.path.exists(engine_lib):
+        parts_tutor.append(read(engine_lib))
+    else:
+        raise SystemExit("missing library: %s" % engine_lib)
+    parts_tutor.append(read(os.path.join(HERE, "tutor.js")))
+    shell = shell.replace(TUTOR_MARKER, "\n".join(parts_tutor), 1)
 if MARKER not in shell:
     sys.exit("marker not found in shell.html")
 
